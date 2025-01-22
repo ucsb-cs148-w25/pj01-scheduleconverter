@@ -5,6 +5,7 @@ Mentor: Self Mentored
 Type of meeting: Daily Scrum
 
 Team: Giovanni Long [x], Abby Fan [x], Ashton Wong [x], Bharat Saiju [], Christian Lee [x], Nathan Alexander [x], Yungong Wang [x]
+- Bahrat didn't show up because his roommate is sick.
 
 *Scribed Discussion*:
 - We each came up with a user story to form the user journey
