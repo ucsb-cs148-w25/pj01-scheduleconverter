@@ -27,20 +27,22 @@ Ashton:
  - Blockers: none
 
  Bharat:
- 
+ - Last Time: made Hello world app
+ - Today: finishing up lab01 and starting lab02
+ - Blockers: none at the moment
 
  Christian:
-- Last Time: Finished Hello World
+ - Last Time: Finished Hello World
  - Today: Finishing lab01
  - Blockers: None
 
- Nathan:
+Nathan:
 - Yesterday: Finished Hello World program
 - Today: Finishing up everything for lab 1
 - Blockers: None at the moment
 
  Yungong:
-- Last Time: finish adding hello world app
+ - Last Time: finish adding hello world app
  - Today: finishing lab01 and doing lab02
  - Blockers: none at this moment
 
