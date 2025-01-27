@@ -1,0 +1,26 @@
+{
+    "courseId": "string",
+    "quarter": "string",
+    "enrollCode": "string",
+    "gradingOptionCode": "string",
+    "unitsAttempted": 0,
+    "courseTitle": "string",
+    "session": "string",
+    "repeatTypeCode": "string",
+    "timeLocations": [
+      {
+        "section": "string",
+        "instructionTypeCode": "string",
+        "days": "string",
+        "beginTime": "string",
+        "endTime": "string",
+        "buildingRoom": "string",
+        "instructors": [
+          {
+            "name": "string",
+            "functionCode": "string"
+          }
+        ]
+      }
+    ]
+  }
