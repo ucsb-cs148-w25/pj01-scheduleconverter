@@ -11,6 +11,7 @@ Team: Giovanni Long [x], Abby Fan [x], Ashton Wong [x], Bharat Saiju [x], Christ
  - Worked on translating/writing final bits of code
  - Looked into Dokku for web app hosting
  - Looked into Netlify as well
+ - Began using Netlify for hosting 
 
 Giovanni:
  - Last Time: Finishing lab02
