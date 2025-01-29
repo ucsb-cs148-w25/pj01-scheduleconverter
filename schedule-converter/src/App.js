@@ -1,6 +1,34 @@
 import './App.css';
+import { useState } from 'react';
 
 function App() {
+  const [permNumber, setPermNumber] = useState('');
+  const [data, setData] = useState([]);
+
+  const handleSearch = () => {
+    fetch('/database.json')
+      .then(response => {
+        console.log('Response status:', response.status);
+        console.log('Response headers:', response.headers);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.text();  // Changed to text() to see raw response
+      })
+      .then(text => {
+        console.log('Raw response:', text);
+        // const json = JSON.parse(text);
+        // const filteredData = json.filter(item => {
+        //   return String(item.perm) === permNumber;
+        // });
+        // setData(filteredData);
+        // console.log('Filtered data:', filteredData);
+      })
+      .catch(error => {
+        console.error('Error details:', error);
+      });
+  };
+
   return (
     <div className="App">
       <div className="card">
@@ -21,11 +49,12 @@ function App() {
               id="permNumber"
               type="text"
               placeholder="Perm Number"
-              onChange={(e) => console.log("perm:" + e.target.value)}
+              value={permNumber}
+              onChange={(e) => setPermNumber(e.target.value)}
             />
             <button
               className="button"
-              onClick={() => console.log("search")}
+              onClick={handleSearch}
             >
               Search
             </button>
