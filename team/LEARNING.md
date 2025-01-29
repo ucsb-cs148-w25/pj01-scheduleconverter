@@ -7,3 +7,7 @@
  3. Learn how to interact with Google Calendar API
  4. Build and deploy front end to allow users to interface with app
 - **Goal:** Finish a React web app.  
+
+## Contributions
+- Giovanni:
+  -  Added [Uiverse](https://uiverse.io/) to the *js_help* channel
