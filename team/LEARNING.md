@@ -11,3 +11,6 @@
 ## Contributions
 - Giovanni:
   -  Added [Uiverse](https://uiverse.io/) to the *js_help* channel
+
+- Abby:
+  - Added link about pull request templates to the *git_help* channel
