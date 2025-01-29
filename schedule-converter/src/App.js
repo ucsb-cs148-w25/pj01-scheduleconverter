@@ -3,26 +3,25 @@ import { useState } from 'react';
 
 function App() {
   const [permNumber, setPermNumber] = useState('');
+  const [quarter, setQuarter] = useState('');
   const [data, setData] = useState([]);
 
   const handleSearch = () => {
     fetch('/database.json')
       .then(response => {
-        console.log('Response status:', response.status);
-        console.log('Response headers:', response.headers);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-        return response.text();  // Changed to text() to see raw response
+        return response.json();
       })
-      .then(text => {
-        console.log('Raw response:', text);
-        // const json = JSON.parse(text);
-        // const filteredData = json.filter(item => {
-        //   return String(item.perm) === permNumber;
-        // });
-        // setData(filteredData);
-        // console.log('Filtered data:', filteredData);
+      .then(json => {
+        const studentData = json[permNumber];
+        if (studentData && studentData[quarter]) {
+          console.log('Found schedule:', studentData[quarter]);
+          setData(studentData[quarter]);
+        } else {
+          console.log('No data found for perm number:', permNumber, 'and quarter:', quarter);
+        }
       })
       .catch(error => {
         console.error('Error details:', error);
@@ -51,6 +50,14 @@ function App() {
               placeholder="Perm Number"
               value={permNumber}
               onChange={(e) => setPermNumber(e.target.value)}
+            />
+            <input
+              className="quarter-input"
+              id="quarter"
+              type="text"
+              placeholder="Quarter"
+              value={quarter}
+              onChange={(e) => setQuarter(e.target.value)}
             />
             <button
               className="button"
