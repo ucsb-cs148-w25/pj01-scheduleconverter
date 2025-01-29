@@ -26,4 +26,9 @@
 
 * Description: Our experiment was to have everybody send a message to the slack every day
 * A brief assessment of how its results (did it improve things? move the needle at all?)
-* A decision going forward: keep the change, revert to previous procedure, make a new change? 
+* A decision going forward: keep the change, revert to previous procedure, make a new change?
+
+We determined having everyone send a message in the slack every day was successful in boosting team collaboration and productivity. 
+We saw more tasks getting done while being more efficient, namley less responsibility colliions and less responsibility gaps.
+
+This focus on communication has also carried over to our daily scrums and meetings, with responsibilities being delegated more proactively.
