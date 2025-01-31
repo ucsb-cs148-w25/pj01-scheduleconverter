@@ -4,7 +4,7 @@ import { useState } from 'react';
 function App() {
   const [permNumber, setPermNumber] = useState('');
   const [quarter, setQuarter] = useState('');
-  const [data, setData] = useState([]);
+  // const [data, setData] = useState([]);
 
   const handleSearch = () => {
     fetch('/database.json')
@@ -18,7 +18,7 @@ function App() {
         const studentData = json[permNumber];
         if (studentData && studentData[quarter]) {
           console.log('Found schedule:', studentData[quarter]);
-          setData(studentData[quarter]);
+          // setData(studentData[quarter]);
         } else {
           console.log('No data found for perm number:', permNumber, 'and quarter:', quarter);
         }
