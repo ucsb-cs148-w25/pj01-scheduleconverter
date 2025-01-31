@@ -42,4 +42,7 @@ Yungong:
  - Today: Still working on converter
  - Blockers: None at the moment
 
- 
+ Nathan:
+- Yesterday: Worked on Lab03
+- Today: Working on Lab03
+- Blockers: None at the moment
