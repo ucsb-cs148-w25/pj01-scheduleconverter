@@ -4,7 +4,7 @@ import { useState } from 'react';
 function App() {
   const [permNumber, setPermNumber] = useState('');
   const [quarter, setQuarter] = useState('');
-  const [data, setData] = useState([]);
+  // const [data, setData] = useState([]);
 
   const handleSearch = () => {
     fetch('/database.json')
