@@ -14,3 +14,6 @@
 
 - Abby:
   - Added link about pull request templates to the *git_help* channel
+
+- Christian:
+  - Added link (https://www.youtube.com/watch?v=QhQ4m5g2fhA) about jQuery to the *js_help* channel
