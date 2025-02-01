@@ -1,5 +1,5 @@
 import './App.css';
-import { useState, ReactNode, SyntheticEvent } from 'react';
+import { useState, ReactNode, SyntheticEvent } from 'react'; // eslint-disable-line no-unused-vars
 import ApiCalendar from 'react-google-calendar-api';
 
 function App() {
