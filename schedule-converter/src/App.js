@@ -15,7 +15,6 @@ function App() {
   }
 
   const apiCalendar = new ApiCalendar(config)
-  // const [data, setData] = useState([]);
 
   const handleSearch = () => {
     fetch('/database.json')
@@ -29,7 +28,7 @@ function App() {
         const studentData = json[permNumber];
         if (studentData && studentData[quarter]) {
           console.log('Found schedule:', studentData[quarter]);
-          // setData(studentData[quarter]);
+          addEvent(studentData[quarter]);
         } else {
           console.log('No data found for perm number:', permNumber, 'and quarter:', quarter);
         }
@@ -69,10 +68,36 @@ function App() {
       ],
     },
   };
-  const addEvent = () => {
-    apiCalendar.createEvent(new_event).then(({ result }) => {
-      console.log(result);
-    });
+
+  const createEventFromCourse = (course) => {
+    console.log(course.courseTitle)
+    const time = course.timeLocations[0];
+    const year = parseInt(course.quarter.slice(0, 4));
+    const quarterMap = { 'W': 0, 'S': 3, 'M': 6, 'F': 9 }; // Map quarters to months
+    const month = quarterMap[course.quarter.slice(-1)];
+    const [startHour, startMinute] = time.beginTime.split(':').map(Number);
+    const [endHour, endMinute] = time.endTime.split(':').map(Number);
+    return {
+      summary: course.courseTitle,
+      // recurrence: [`RRULE:FREQ=WEEKLY;COUNT=10;BYDAY=${time.days.split(' ').map(day => day.substring(0, 2)).join(',')}`],
+      start: {
+        dateTime: new Date(year, month, 1, startHour, startMinute).toISOString(),
+        timeZone: "America/Los_Angeles",
+      },
+      end: {
+        dateTime: new Date(year, month, 1, endHour, endMinute).toISOString(),
+        timeZone: "America/Los_Angeles",
+      }
+    }
+  };
+
+  const addEvent = async (courses) => {
+    for (const course of courses){
+      // console.log(createEventFromCourse(course))
+      apiCalendar.createEvent(createEventFromCourse(course)).then(({ result }) => {
+        console.log(result);
+      });
+    }
   }
 
   return (
