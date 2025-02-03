@@ -6,11 +6,11 @@ function App() {
   const [permNumber, setPermNumber] = useState('');
   const [quarter, setQuarter] = useState('');
   const config = {
-    "clientId": "<CLIENT ID>",
-    "apiKey": "<API KEY>>",
+    "clientId": process.env.REACT_APP_GOOGLE_CLIENT_ID,
+    "apiKey": process.env.REACT_APP_GOOGLE_API_KEY,
     "scope": "https://www.googleapis.com/auth/calendar",
     "discoveryDocs": [
-      "https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"
+      "https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest",
     ]
   }
 
@@ -43,6 +43,35 @@ function App() {
     apiCalendar.listEvents({
     }).then(({ result }) => {
       console.log(result.items);
+    });
+  }
+  const new_event = {
+    summary: "Google I/O 2015",
+    location: "800 Howard St., San Francisco, CA 94103",
+    description: "A chance to hear more about Google's developer products.",
+    start: {
+      dateTime: new Date(2025, 1, 3, 9, 0, 0, 7).toISOString(),
+      timeZone: "America/Los_Angeles",
+    },
+    end: {
+      dateTime: new Date(2025, 1, 3, 12, 0, 0, 7).toISOString(),
+      timeZone: "America/Los_Angeles",
+    },
+    attendees: [
+      { email: "lpage@example.com" },
+      { email: "sbrin@example.com" },
+    ],
+    reminders: {
+      useDefault: false,
+      overrides: [
+        { method: "email", minutes: 24 * 60 },
+        { method: "popup", minutes: 10 },
+      ],
+    },
+  };
+  const addEvent = () => {
+    apiCalendar.createEvent(new_event).then(({ result }) => {
+      console.log(result);
     });
   }
 
@@ -100,7 +129,7 @@ function App() {
 
         <button
           className="button"
-          onClick={() => console.log("convert schedule clicked")}
+          onClick={addEvent}
         >
           Convert Schedule to Google Calendar
         </button>
