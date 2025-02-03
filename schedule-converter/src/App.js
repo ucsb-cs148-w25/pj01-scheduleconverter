@@ -6,8 +6,8 @@ function App() {
   const [permNumber, setPermNumber] = useState('');
   const [quarter, setQuarter] = useState('');
   const config = {
-    "clientId": "<CLIENT ID>",
-    "apiKey": "<API KEY>>",
+    "clientId": ProcessingInstruction.env.REACT_APP_GOOGLE_CLIENT_ID,
+    "apiKey": ProcessingInstruction.env.REACT_APP_GOOGLE_API_KEY,
     "scope": "https://www.googleapis.com/auth/calendar",
     "discoveryDocs": [
       "https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"
