@@ -122,7 +122,7 @@ function App() {
               className="quarter-input"
               id="quarter"
               type="text"
-              placeholder="Quarter"
+              placeholder="Quarter (YYYYQ)"
               value={quarter}
               onChange={(e) => setQuarter(e.target.value)}
             />
