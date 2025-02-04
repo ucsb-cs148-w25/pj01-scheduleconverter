@@ -44,30 +44,6 @@ function App() {
       console.log(result.items);
     });
   }
-  const new_event = {
-    summary: "Google I/O 2015",
-    location: "800 Howard St., San Francisco, CA 94103",
-    description: "A chance to hear more about Google's developer products.",
-    start: {
-      dateTime: new Date(2025, 1, 3, 9, 0, 0, 7).toISOString(),
-      timeZone: "America/Los_Angeles",
-    },
-    end: {
-      dateTime: new Date(2025, 1, 3, 12, 0, 0, 7).toISOString(),
-      timeZone: "America/Los_Angeles",
-    },
-    attendees: [
-      { email: "lpage@example.com" },
-      { email: "sbrin@example.com" },
-    ],
-    reminders: {
-      useDefault: false,
-      overrides: [
-        { method: "email", minutes: 24 * 60 },
-        { method: "popup", minutes: 10 },
-      ],
-    },
-  };
 
   const createEventFromCourse = (course) => {
     console.log(course.courseTitle)
@@ -77,9 +53,16 @@ function App() {
     const month = quarterMap[course.quarter.slice(-1)];
     const [startHour, startMinute] = time.beginTime.split(':').map(Number);
     const [endHour, endMinute] = time.endTime.split(':').map(Number);
+    const dayMap = {
+      'M': 'MO',
+      'T': 'TU',
+      'W': 'WE',
+      'R': 'TH',
+      'F': 'FR'
+    };
     return {
       summary: course.courseTitle,
-      // recurrence: [`RRULE:FREQ=WEEKLY;COUNT=10;BYDAY=${time.days.split(' ').map(day => day.substring(0, 2)).join(',')}`],
+      recurrence: [`RRULE:FREQ=WEEKLY;COUNT=10;BYDAY=${time.days.split(' ').map(day => dayMap[day]).join(',')}`],
       start: {
         dateTime: new Date(year, month, 1, startHour, startMinute).toISOString(),
         timeZone: "America/Los_Angeles",
