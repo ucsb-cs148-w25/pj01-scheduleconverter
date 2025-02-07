@@ -11,8 +11,8 @@ Team: Giovanni Long [x], Abby Fan [x], Ashton Wong [x], Bharat Saiju [x], Christ
   - We just finished our MVP review, and we are planning to further refine our app
 - What steps are next?
   - Review the MVP feedback
-  - Doing lab05
-  - Keep working on the project
+  - Begin to adapt our workflow based on the feedback
+  - Work on lab05
 
 Giovanni:
  - Last Time: Working on lab04, reviewing other projects
