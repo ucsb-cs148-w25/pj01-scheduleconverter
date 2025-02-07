@@ -6,16 +6,15 @@ function App() {
   const [permNumber, setPermNumber] = useState('');
   const [quarter, setQuarter] = useState('');
   const config = {
-    "clientId": ProcessingInstruction.env.REACT_APP_GOOGLE_CLIENT_ID,
-    "apiKey": ProcessingInstruction.env.REACT_APP_GOOGLE_API_KEY,
+    "clientId": process.env.REACT_APP_GOOGLE_CLIENT_ID,
+    "apiKey": process.env.REACT_APP_GOOGLE_API_KEY,
     "scope": "https://www.googleapis.com/auth/calendar",
     "discoveryDocs": [
-      "https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"
+      "https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest",
     ]
   }
 
   const apiCalendar = new ApiCalendar(config)
-  // const [data, setData] = useState([]);
 
   const handleSearch = () => {
     fetch('/database.json')
@@ -29,7 +28,10 @@ function App() {
         const studentData = json[permNumber];
         if (studentData && studentData[quarter]) {
           console.log('Found schedule:', studentData[quarter]);
-          // setData(studentData[quarter]);
+          console.log("Type of studentData[quarter]:", typeof studentData[quarter]);
+          // const scheduleArray = Object.entries(studentData[quarter]);
+          // console.log("Type of scheduleArray:", typeof scheduleArray);
+          addEvent(studentData[quarter]);
         } else {
           console.log('No data found for perm number:', permNumber, 'and quarter:', quarter);
         }
@@ -44,6 +46,45 @@ function App() {
     }).then(({ result }) => {
       console.log(result.items);
     });
+  }
+
+  const createEventFromCourse = (course) => {
+    console.log(course.courseTitle)
+    const time = course.timeLocations[0];
+    const year = parseInt(course.quarter.slice(0, 4));
+    const quarterMap = { 'W': 0, 'S': 3, 'M': 6, 'F': 9 }; // Map quarters to months
+    const month = quarterMap[course.quarter.slice(-1)];
+    const [startHour, startMinute] = time.beginTime.split(':').map(Number);
+    const [endHour, endMinute] = time.endTime.split(':').map(Number);
+    const dayMap = {
+      'M': 'MO',
+      'T': 'TU',
+      'W': 'WE',
+      'R': 'TH',
+      'F': 'FR'
+    };
+    const time_len = time.days.split(' ').length;
+    return {
+      summary: course.courseTitle,
+      recurrence: [`RRULE:FREQ=WEEKLY;COUNT=${time_len * 10};BYDAY=${time.days.split(' ').map(day => dayMap[day]).join(',')}`],
+      start: {
+        dateTime: new Date(year, month, 1, startHour, startMinute).toISOString(),
+        timeZone: "America/Los_Angeles",
+      },
+      end: {
+        dateTime: new Date(year, month, 1, endHour, endMinute).toISOString(),
+        timeZone: "America/Los_Angeles",
+      }
+    }
+  };
+
+  const addEvent = async (courses) => {
+    for (const course of courses){
+      // console.log(createEventFromCourse(course))
+      apiCalendar.createEvent(createEventFromCourse(course)).then(({ result }) => {
+        console.log(result);
+      });
+    }
   }
 
   return (
@@ -85,7 +126,7 @@ function App() {
               className="quarter-input"
               id="quarter"
               type="text"
-              placeholder="Quarter"
+              placeholder="Quarter (YYYYQ)"
               value={quarter}
               onChange={(e) => setQuarter(e.target.value)}
             />
@@ -100,7 +141,7 @@ function App() {
 
         <button
           className="button"
-          onClick={() => console.log("convert schedule clicked")}
+          onClick={addEvent}
         >
           Convert Schedule to Google Calendar
         </button>
