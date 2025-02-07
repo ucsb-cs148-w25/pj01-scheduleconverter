@@ -28,6 +28,9 @@ function App() {
         const studentData = json[permNumber];
         if (studentData && studentData[quarter]) {
           console.log('Found schedule:', studentData[quarter]);
+          console.log("Type of studentData[quarter]:", typeof studentData[quarter]);
+          // const scheduleArray = Object.entries(studentData[quarter]);
+          // console.log("Type of scheduleArray:", typeof scheduleArray);
           addEvent(studentData[quarter]);
         } else {
           console.log('No data found for perm number:', permNumber, 'and quarter:', quarter);
@@ -60,9 +63,10 @@ function App() {
       'R': 'TH',
       'F': 'FR'
     };
+    const time_len = time.days.split(' ').length;
     return {
       summary: course.courseTitle,
-      recurrence: [`RRULE:FREQ=WEEKLY;COUNT=10;BYDAY=${time.days.split(' ').map(day => dayMap[day]).join(',')}`],
+      recurrence: [`RRULE:FREQ=WEEKLY;COUNT=${time_len * 10};BYDAY=${time.days.split(' ').map(day => dayMap[day]).join(',')}`],
       start: {
         dateTime: new Date(year, month, 1, startHour, startMinute).toISOString(),
         timeZone: "America/Los_Angeles",
