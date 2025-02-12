@@ -73,7 +73,7 @@ label {
 
 /* Dark mode styles */
 .App.dark-mode {
-  background-color: #212121;
+  background-color: #111517;
   color: #f3f3f3;
 }
 
@@ -87,7 +87,7 @@ label {
 }
 
 .dark-mode .button:hover {
-  background-color: #666;
+  background-color: #FEBC11;
 }
 
 .dark-mode .button:active {

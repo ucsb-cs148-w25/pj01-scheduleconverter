@@ -1,11 +1,19 @@
 import './App.css';
-import { useState } from 'react';
+import { useState, useEffect} from 'react';
 import ApiCalendar from 'react-google-calendar-api';
 
 function App() {
   const [permNumber, setPermNumber] = useState('');
   const [quarter, setQuarter] = useState('');
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState(() => {
+    const storedTheme = localStorage.getItem('theme');
+    // If there is no stored theme, match system theme
+    if (storedTheme == null) {
+      const isDark = window.matchMedia("(prefers-color-scheme:dark)").matches
+      return isDark
+    }
+    return storedTheme === 'dark';
+  });
 
   const config = {
     clientId: process.env.REACT_APP_GOOGLE_CLIENT_ID,
@@ -17,6 +25,10 @@ function App() {
   };
 
   const apiCalendar = new ApiCalendar(config);
+
+  useEffect(() => {
+    localStorage.setItem('theme', darkMode ? 'dark' : 'light');
+  }, [darkMode]);
 
   const handleSearch = () => {
     fetch('/database.json')
