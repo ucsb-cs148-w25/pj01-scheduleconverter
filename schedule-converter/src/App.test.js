@@ -27,3 +27,11 @@ test('test for renders - text', () => {
   const text1 = screen.getByText(/Enter Perm Number:/i);
   expect(text1).toBeInTheDocument();
 });
+
+test('test for render - placeholders', () => {
+  render(<App />);
+  const perm_input = screen.getByPlaceholderText('Perm Number');
+  const quarter_input = screen.getByPlaceholderText('Quarter (YYYYQ)');
+  expect(perm_input).toBeInTheDocument();
+  expect(quarter_input).toBeInTheDocument();
+});
