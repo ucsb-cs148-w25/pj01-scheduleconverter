@@ -1,4 +1,4 @@
-#Abby
+# Abby
 - Used AI: ChatGPT
 - Outcome: A summary of the key points on the things people liked and suggestions and improvements for our team.
 - how useful this tool was / potentially could be for your coding effort going forward
@@ -6,7 +6,14 @@
 - what steps you needed to (or couldn’t) take to ensure that the AI output was correct, understandable, and fair use
     - To make sure that the output was correct, we would have to read all the content in the file I plugged in, which loses the point of letting the AI summarize it. Therefore, it would be more beneficial to read through the response and look for sketchy to simply disregard since this summary should be in content that we are all familiar with.
 
-#Yungong
+# Giovanni
+- Used AI: ChatGPT
+- Usecase: Touching up/improving the UI using suggestions given by, also used to fix some minor visual issues with the UI
+- Outcome: After some initial issues just giving instructions to just "fix it", I ended up having it offer some potential solutions, and it was only actually useful for quickly locating what I needed to change. Adding elements such as a switch, however, proved to be much more effective. 
+- Usefulness: Useful for brainstorming, adding fresh features, but infeffective at fixing large issues in one shot. Useful for general information and providing a list of possible options. 
+- Steps taken to ensure correctness: Gave the model a structured input where the overview, problem, and acceptable solution was clearly outlined, as well as clearly defined files. Tested code to ensure it ran correctly and achieved what was intended. 
+
+# Yungong
 - Used AI: ChatGPT
 - Outcome: Some suggestion about which test-lib should we use, some common testing functions and the way to use them, and how to install the config and dependencies for the test-lib.
 - how useful this tool was / potentially could be for your coding effort going forward
