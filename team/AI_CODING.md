@@ -22,3 +22,10 @@
 - what steps you needed to (or couldn’t) take to ensure that the AI output was correct, understandable, and fair use
     - The best way to make sure whether the AI output is correct is actually following the step it generated. However, this does not means that we should just copy and paste the code that ChatGPT writes for us. I think we should first try to understand the function and format that ChatGPT provides with us, and think about it if they are reasonable, and then try to use them on our local host for our own word and modification for our purpose. It is better and important to use the AI output cautiously.
 
+# Christian
+- Used AI: ChatGPT
+- Outcome: A rudimentary React program that calls on UCSB API.
+- How useful this tool was / potentially could be for your coding effort going forward:
+    - ChatGPT does a tremendous job creating a framework of some function that would otherwise be tedious to implement alone, especially without prior experience. It also explains step-by-step what it's doing so I'm not merely copying code, but understanding it for future use.
+- What steps you needed to (or couldn’t) take to ensure that the AI output was correct, understandable, and fair use:
+    - Obviously, I had to run the program to ensure it properly called the API. However, the functionality wasn't quite what I was looking for which is totally okay. Now that I verified what output is doing, I can now make my adjustments so it fits my team's needs.
