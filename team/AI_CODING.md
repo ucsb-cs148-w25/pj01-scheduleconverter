@@ -36,3 +36,19 @@
     - ChatGPT does a tremendous job creating a framework of some function that would otherwise be tedious to implement alone, especially without prior experience. It also explains step-by-step what it's doing so I'm not merely copying code, but understanding it for future use.
 - What steps you needed to (or couldn’t) take to ensure that the AI output was correct, understandable, and fair use:
     - Obviously, I had to run the program to ensure it properly called the API. However, the functionality wasn't quite what I was looking for which is totally okay. Now that I verified what output is doing, I can now make my adjustments so it fits my team's needs.
+ 
+# Ashton
+## Usage 1
+- Used AI: Uizard
+- Outcome: A layout/wireframe of a redesigned user interface
+- How useful this tool was / potentially could be for your coding effort going forward:
+    - Uizard was very useful to envision and prototype UI possibilities, which I can then replicate in code. This makes for a more efficient design process for someone with a less design-oriented mind.
+- What steps you needed to (or couldn’t) take to ensure that the AI output was correct, understandable, and fair use:
+    - Uizard allows for adjustments, but the way in which I'm using it where it is simply a launchpad for the user interface, means there is no "correctness" that I have to check.
+## Usage 2
+- Used AI: Cursor with Claude 3.5-Sonnet
+- Outcome: Bug free code
+- How useful this tool was / potentially could be for your coding effort going forward:
+    - Cursor is a code editor with AI embedded in it. I was able to do tedious bug fixes by simply asking the editor what the issue might be, and it can even make the edits for me. This made the process of debugging way more efficient, and allowed me to sooner get to work on the actual project.
+- What steps you needed to (or couldn’t) take to ensure that the AI output was correct, understandable, and fair use:
+    - As with any AI suggestion or edit to code, I had to run it to make sure it was correct, but furthermore, the prompts had to be pretty specific to be helpful; outlining exactly what the error was, and where I think it might originate from
