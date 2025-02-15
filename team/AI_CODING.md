@@ -22,3 +22,17 @@
 - what steps you needed to (or couldn’t) take to ensure that the AI output was correct, understandable, and fair use
     - The best way to make sure whether the AI output is correct is actually following the step it generated. However, this does not means that we should just copy and paste the code that ChatGPT writes for us. I think we should first try to understand the function and format that ChatGPT provides with us, and think about it if they are reasonable, and then try to use them on our local host for our own word and modification for our purpose. It is better and important to use the AI output cautiously.
 
+# Nathan
+- Used AI: ChatGPT
+- Usecase: Prototyping new additions in the form of dropdown menus with UCSB Gold class information. This class information is extracted using new APIs that are publicly available.
+- Outcome: A very simple program that demonstrates how extracting class information and putting it into a dropdown menu would work. Helpful (at least to me) for seeing how requesting information using an API works. Nothing actually added onto the project itself, I made everything in a separate test app.
+- Usefulness: Very useful for someone like me who doesn't really know where to start with something like this. ChatGPT was able to easily set up a working dropdown menu that, after a bit of fixing on my part with the API key, displayed a full list of all the classes available at UCSB limited by the page size specified in the API request. I've been experimenting with customizing the API request to narrow down the class list, but regardless, it has been a very helpful foundation to go off of. It didn't do much for the aesthetics of the app (I didn't tell it to make it look better) but that's obviously something we would do ourselves.
+- Steps taken to ensure correctness: I provided ChatGPT with the source file for the test app I was using to ensure that the result would be easy to integrate back into the app itself. I also made my requests simple yet detailed enough to provide useful results. 
+
+# Christian
+- Used AI: ChatGPT
+- Outcome: A rudimentary React program that calls on UCSB API.
+- How useful this tool was / potentially could be for your coding effort going forward:
+    - ChatGPT does a tremendous job creating a framework of some function that would otherwise be tedious to implement alone, especially without prior experience. It also explains step-by-step what it's doing so I'm not merely copying code, but understanding it for future use.
+- What steps you needed to (or couldn’t) take to ensure that the AI output was correct, understandable, and fair use:
+    - Obviously, I had to run the program to ensure it properly called the API. However, the functionality wasn't quite what I was looking for which is totally okay. Now that I verified what output is doing, I can now make my adjustments so it fits my team's needs.
