@@ -1,5 +1,5 @@
 import './App.css';
-import { useState, useEffect} from 'react';
+import { useState, useEffect } from 'react';
 import ApiCalendar from 'react-google-calendar-api';
 
 function App() {
@@ -237,7 +237,7 @@ function App() {
         icsContent += '\r\n' + eventLines.map(line => foldLine(line)).join('\r\n');
       });
 
-      icsContent += '\r\n' + 'END:VCALENDAR';
+      icsContent += '\r\nEND:VCALENDAR';
 
       const bom = new Uint8Array([0xEF, 0xBB, 0xBF]);
       const blob = new Blob([bom, icsContent], {
