@@ -319,7 +319,7 @@ function App() {
           Convert Schedule to Google Calendar
         </button>
         <div>
-          <button onClick={generateICS}>Export as ICS</button>
+          <button className="button" onClick={generateICS}>Export as ICS</button>
         </div>
       </div>
     </div>
