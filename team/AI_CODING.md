@@ -36,6 +36,15 @@
     - ChatGPT does a tremendous job creating a framework of some function that would otherwise be tedious to implement alone, especially without prior experience. It also explains step-by-step what it's doing so I'm not merely copying code, but understanding it for future use.
 - What steps you needed to (or couldn’t) take to ensure that the AI output was correct, understandable, and fair use:
     - Obviously, I had to run the program to ensure it properly called the API. However, the functionality wasn't quite what I was looking for which is totally okay. Now that I verified what output is doing, I can now make my adjustments so it fits my team's needs.
+
+# Bharat
+- Used AI: Claude
+- Usecase: Figuring out proper ics format for calendar files and how to structure the code
+- Outcome: A button that, when pressed, creates a ics file of your calendar
+- How useful this tool was / potentially could be for your coding effort going forward:
+    - Claude helped alot on showing me what was necessary. It gave me useful insights on the nature of the ICS format and how specific it could be. It also helped in creating certain Regex formulas which I otherwise would've spent a while trying to create by myself.
+- What steps you needed to (or couldn't) take to ensure that the AI output was correct, understandable, and fair use:
+    - Testing it out was the main method of ensuring it was correct. In fact, it wasn't correct the first time. I had to go into the code and rewrite certain portions to fit my specific use case. There were small hiccups here and there were the output was not strict enough with the ics standard. Even now, there is a potential bug where every event is duplicated. I will be taking a stab at that for my next task.
  
 # Ashton
 ## Usage 1
