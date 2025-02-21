@@ -24,7 +24,7 @@
 
 ## Experiment/Change
 
-* Description: 
+* Description: Our experiment based on this retro is to have everybody add/move an item through the kanban board every week
 * Assessment:
 * Decision Going Forward:
 
