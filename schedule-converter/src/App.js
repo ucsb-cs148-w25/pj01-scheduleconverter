@@ -1,8 +1,6 @@
 import "./App.css";
 import { useState, useEffect } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ApiCalendar from "react-google-calendar-api";
-import BasicExample from "./App_Search.js";
 
 // Quarter options for UCSB course search
 const quarterOptions = [
@@ -274,14 +272,6 @@ function App() {
           </div>
         </label>
       </div>
-
-      <BrowserRouter>
-        <div className="app">
-          <Routes>
-            <Route path="/App_Search" element={<BasicExample />} />
-          </Routes>
-        </div>
-      </BrowserRouter>
 
       {/* Schedule to Google Calendar Card */}
       <div className="card">
