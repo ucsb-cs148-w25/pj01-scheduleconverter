@@ -1,76 +1,200 @@
-import './App.css';
-import { useState, useEffect } from 'react';
-import ApiCalendar from 'react-google-calendar-api';
+import "./App.css";
+import { useState, useEffect } from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import ApiCalendar from "react-google-calendar-api";
+import BasicExample from "./App_Search.js";
+
+// Quarter options for UCSB course search
+const quarterOptions = [
+  { label: "Spring 2025", value: "20252" },
+  { label: "Winter 2025", value: "20251" },
+  { label: "Fall 2024", value: "20244" },
+  { label: "Summer 2024", value: "20243" },
+  { label: "Spring 2024", value: "20242" },
+  { label: "Winter 2024", value: "20241" },
+  { label: "Fall 2023", value: "20234" },
+];
 
 function App() {
-  const [permNumber, setPermNumber] = useState('');
-  const [quarter, setQuarter] = useState('');
+  // Theme state
   const [darkMode, setDarkMode] = useState(() => {
-    const storedTheme = localStorage.getItem('theme');
-    // If there is no stored theme, match system theme
+    const storedTheme = localStorage.getItem("theme");
     if (storedTheme == null) {
-      const isDark = window.matchMedia("(prefers-color-scheme:dark)").matches
-      return isDark
+      return window.matchMedia("(prefers-color-scheme:dark)").matches;
     }
-    return storedTheme === 'dark';
+    return storedTheme === "dark";
   });
 
+  // UCSB Course Search States
+  const [courseSearchQuarter, setCourseSearchQuarter] = useState("");
+  const [courseFilter, setCourseFilter] = useState("");
+  const [courses, setCourses] = useState([]);
+  const [filteredCourses, setFilteredCourses] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [hasSearched, setHasSearched] = useState(false);
+  // Instead of storing just courses, we now store an object { course, section } per selection.
+  const [selectedCourses, setSelectedCourses] = useState([]);
+  // For tracking hover state (by courseId)
+  const [hoveredCourseId, setHoveredCourseId] = useState(null);
+
+  // Google Calendar API configuration
   const config = {
-    clientId: process.env.REACT_APP_GOOGLE_CLIENT_ID,
-    apiKey: process.env.REACT_APP_GOOGLE_API_KEY,
+    clientId:
+      "915729068911-kfgg568j8f31i6l99phkr5ukj8b5pghe.apps.googleusercontent.com",
+    apiKey: "AIzaSyAR9EUU2RZtGvZAEMSGZp_s3qozrxB2vrI",
     scope: "https://www.googleapis.com/auth/calendar",
     discoveryDocs: [
       "https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest",
-    ]
+    ],
   };
-
   const apiCalendar = new ApiCalendar(config);
 
   useEffect(() => {
-    localStorage.setItem('theme', darkMode ? 'dark' : 'light');
+    localStorage.setItem("theme", darkMode ? "dark" : "light");
   }, [darkMode]);
 
-  const handleSearch = () => {
-    fetch('/database.json')
-      .then(response => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
-      })
-      .then(json => {
-        const studentData = json[permNumber];
-        if (studentData && studentData[quarter]) {
-          console.log('Found schedule:', studentData[quarter]);
-          addEvent(studentData[quarter]);
-        } else {
-          console.log('No data found for perm number:', permNumber, 'and quarter:', quarter);
-        }
-      })
-      .catch(error => {
-        console.error('Error details:', error);
+  // UCSB API key for course search
+  const apiKey = "3JXdEElm20bMv3cL5huEvZEB0W6opCo2"; // Replace with your actual UCSB API Key
+
+  const fetchCourses = async () => {
+    if (!courseSearchQuarter) {
+      setError("Please select a valid quarter.");
+      return;
+    }
+    setLoading(true);
+    setError("");
+    setCourses([]);
+    setFilteredCourses([]);
+    setHasSearched(true);
+    try {
+      const pageSize = 500;
+      const firstPageUrl = `https://api.ucsb.edu/academics/curriculums/v1/classes/search?quarter=${courseSearchQuarter}&pageSize=${pageSize}&pageNumber=1`;
+      const firstResponse = await fetch(firstPageUrl, {
+        headers: { "ucsb-api-key": apiKey },
       });
+      if (!firstResponse.ok)
+        throw new Error(`API error: ${firstResponse.status}`);
+      const firstData = await firstResponse.json();
+      const firstClasses = firstData.classes || [];
+      setCourses(firstClasses);
+      const total = firstData.total || firstClasses.length;
+      const totalPages = Math.ceil(total / pageSize);
+      if (totalPages > 1) {
+        const pagePromises = [];
+        for (let p = 2; p <= totalPages; p++) {
+          const pageUrl = `https://api.ucsb.edu/academics/curriculums/v1/classes/search?quarter=${courseSearchQuarter}&pageSize=${pageSize}&pageNumber=${p}`;
+          const promise = fetch(pageUrl, {
+            headers: { "ucsb-api-key": apiKey },
+          })
+            .then((res) => {
+              if (!res.ok)
+                throw new Error(`API error on page ${p}: ${res.status}`);
+              return res.json();
+            })
+            .then((pageData) => {
+              const pageClasses = pageData.classes || [];
+              setCourses((prevCourses) => [...prevCourses, ...pageClasses]);
+            });
+          pagePromises.push(promise);
+        }
+        await Promise.all(pagePromises);
+      }
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
+  // Fetch courses when the selected quarter changes
+  useEffect(() => {
+    if (courseSearchQuarter) {
+      fetchCourses();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [courseSearchQuarter]);
+
+  // Filter courses based on courseFilter input
+  useEffect(() => {
+    if (courseFilter.trim() === "") {
+      setFilteredCourses([]);
+      return;
+    }
+    const normalizeCourseId = (courseId) =>
+      courseId.replace(/\s+/g, "").toLowerCase();
+    const normalizedFilter = courseFilter.replace(/\s+/g, "").toLowerCase();
+
+    const filtered = courses.filter(
+      (course) =>
+        course.title.toLowerCase().includes(courseFilter.toLowerCase()) ||
+        normalizeCourseId(course.courseId).includes(normalizedFilter)
+    );
+
+    const sortedFiltered = [...filtered].sort((a, b) => {
+      const numA = parseInt(a.courseId.match(/\d+/)?.[0] || "0", 10);
+      const numB = parseInt(b.courseId.match(/\d+/)?.[0] || "0", 10);
+      return numA - numB;
+    });
+
+    setFilteredCourses(sortedFiltered);
+  }, [courseFilter, courses]);
+
+  // When selecting a section from the sublist, update the selection for that course.
+  const handleSectionSelect = (course, section) => {
+    setSelectedCourses((prev) => {
+      const existing = prev.find(
+        (item) => item.course.courseId === course.courseId
+      );
+      // If same section is already selected, deselect it.
+      if (existing && existing.section.section === section.section) {
+        return prev.filter((item) => item.course.courseId !== course.courseId);
+      }
+      // Otherwise, update or add the selection.
+      if (existing) {
+        return prev.map((item) =>
+          item.course.courseId === course.courseId ? { course, section } : item
+        );
+      }
+      return [...prev, { course, section }];
+    });
+  };
+
+  // Check if a course is selected and return the selected section (if any)
+  const getSelectedSection = (course) => {
+    return selectedCourses.find(
+      (item) => item.course.courseId === course.courseId
+    );
+  };
+
+  // Google Calendar functions
   const listEvents = () => {
     apiCalendar.listEvents({}).then(({ result }) => {
       console.log(result.items);
     });
   };
 
-  const createEventFromCourse = (course) => {
-    const time = course.timeLocations[0];
+  // Create event using the selected course and its chosen section.
+  const createEventFromSelectedCourse = (selected) => {
+    const { course, section } = selected;
+    // Use the first timeLocation from the section
+    const time = section.timeLocations[0];
     const year = parseInt(course.quarter.slice(0, 4));
-    const quarterMap = { 'W': 0, 'S': 3, 'M': 6, 'F': 9 };
+    const quarterMap = { W: 0, S: 3, M: 6, F: 9 };
     const month = quarterMap[course.quarter.slice(-1)];
-    const [startHour, startMinute] = time.beginTime.split(':').map(Number);
-    const [endHour, endMinute] = time.endTime.split(':').map(Number);
-    const dayMap = { 'M': 'MO', 'T': 'TU', 'W': 'WE', 'R': 'TH', 'F': 'FR' };
-    const time_len = time.days.split(' ').length;
+    const [startHour, startMinute] = time.beginTime.split(":").map(Number);
+    const [endHour, endMinute] = time.endTime.split(":").map(Number);
+    const dayMap = { M: "MO", T: "TU", W: "WE", R: "TH", F: "FR" };
+    const time_len = time.days.split(" ").length;
     return {
-      summary: course.courseTitle,
+      summary:
+        course.title +
+        (section.section ? ` - Section ${section.section}` : ""),
       recurrence: [
-        `RRULE:FREQ=WEEKLY;COUNT=${time_len * 10};BYDAY=${time.days.split(' ').map(day => dayMap[day]).join(',')}`
+        `RRULE:FREQ=WEEKLY;COUNT=${time_len * 10};BYDAY=${time.days
+          .split(" ")
+          .map((day) => dayMap[day])
+          .join(",")}`,
       ],
       start: {
         dateTime: new Date(year, month, 1, startHour, startMinute).toISOString(),
@@ -79,183 +203,36 @@ function App() {
       end: {
         dateTime: new Date(year, month, 1, endHour, endMinute).toISOString(),
         timeZone: "America/Los_Angeles",
-      }
+      },
     };
   };
 
-  const addEvent = async (courses) => {
-    for (const course of courses) {
-      apiCalendar.createEvent(createEventFromCourse(course)).then(({ result }) => {
-        console.log(result);
-      });
+  const addEvent = async (selectedCourses) => {
+    for (const selected of selectedCourses) {
+      apiCalendar
+        .createEvent(createEventFromSelectedCourse(selected))
+        .then(({ result }) => {
+          console.log(result);
+        });
     }
   };
 
-  const generateICS = async () => {
-    try {
-      const response = await apiCalendar.listEvents();
-      const events = response.result.items || [];
-
-      const escapeText = (text) => {
-        if (!text) return '';
-        return text
-          .replace(/[\\;,]/g, (match) => '\\' + match)
-          .replace(/\n/g, '\\n')
-          .replace(/\r/g, '\\r')
-          .replace(/[^\x20-\x7E]/g, '')
-          .replace(/"/g, '\'');
-      };
-
-      const foldLine = (line) => {
-        if (line.length <= 75) return line;
-        const parts = [];
-        let currentLine = '';
-
-        const chars = [...line];
-
-        for (const char of chars) {
-          if ((currentLine + char).length > 74) {
-            parts.push(currentLine);
-            currentLine = ' ' + char;
-          } else {
-            currentLine += char;
-          }
-        }
-        if (currentLine) parts.push(currentLine);
-
-        return parts.join('\r\n');
-      };
-
-      const timestamp = new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
-      const organizerDomain = window.location.hostname || 'yourdomain.com';
-
-      let icsContent = [
-        'BEGIN:VCALENDAR',
-        'VERSION:2.0',
-        'PRODID:-//Your Organization//Your App//EN',
-        'CALSCALE:GREGORIAN',
-        'METHOD:PUBLISH',
-        `X-WR-CALNAME:${escapeText('My Calendar')}`,
-        `X-WR-CALDESC:${escapeText('Exported Calendar')}`,
-        'X-WR-TIMEZONE:UTC',
-        'BEGIN:VTIMEZONE',
-        'TZID:UTC',
-        'BEGIN:STANDARD',
-        'DTSTART:19700101T000000Z',
-        'TZOFFSETFROM:+0000',
-        'TZOFFSETTO:+0000',
-        'END:STANDARD',
-        'END:VTIMEZONE'
-      ].join('\r\n');
-
-      events.forEach(event => {
-        if (!event.start || !event.end) return;
-
-        const uid = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}@${organizerDomain}`;
-
-        const isAllDay = Boolean(event.start.date);
-
-        let start, end;
-
-        if (isAllDay) {
-          start = event.start.date.replace(/-/g, '');
-          const endDate = new Date(event.end.date);
-          endDate.setDate(endDate.getDate() + 1);
-          end = endDate.toISOString().split('T')[0].replace(/-/g, '');
-        } else {
-          start = new Date(event.start.dateTime)
-            .toISOString()
-            .replace(/[-:]/g, '')
-            .split('.')[0] + 'Z';
-          end = new Date(event.end.dateTime)
-            .toISOString()
-            .replace(/[-:]/g, '')
-            .split('.')[0] + 'Z';
-        }
-
-        const eventLines = [
-          '',
-          'BEGIN:VEVENT',
-          `UID:${uid}`,
-          `DTSTAMP:${timestamp}`,
-          isAllDay ? `DTSTART;VALUE=DATE:${start}` : `DTSTART:${start}`,
-          isAllDay ? `DTEND;VALUE=DATE:${end}` : `DTEND:${end}`,
-          `SUMMARY:${escapeText(event.summary || 'Untitled Event')}`,
-          'CLASS:PUBLIC',
-          'SEQUENCE:0',
-          `CREATED:${timestamp}`,
-          `LAST-MODIFIED:${timestamp}`
-        ];
-
-        if (event.description?.trim()) {
-          eventLines.push(`DESCRIPTION:${escapeText(event.description)}`);
-        }
-
-        if (event.location?.trim()) {
-          eventLines.push(`LOCATION:${escapeText(event.location)}`);
-        }
-
-        if (event.status) {
-          const validStatuses = ['CONFIRMED', 'TENTATIVE', 'CANCELLED'];
-          const status = event.status.toUpperCase();
-          if (validStatuses.includes(status)) {
-            eventLines.push(`STATUS:${status}`);
-          }
-        }
-
-        if (event.organizer?.email) {
-          const organizerName = escapeText(event.organizer.displayName || event.organizer.email);
-          eventLines.push(`ORGANIZER;CN=${organizerName}:mailto:${event.organizer.email}`);
-        }
-
-        if (event.attendees?.length) {
-          event.attendees.forEach(attendee => {
-            if (!attendee.email) return;
-
-            const params = [];
-            if (attendee.displayName) {
-              params.push(`CN=${escapeText(attendee.displayName)}`);
-            }
-
-            const role = attendee.organizer ? 'CHAIR' : 'REQ-PARTICIPANT';
-            params.push(`ROLE=${role}`);
-
-            const partstat = attendee.responseStatus === 'accepted' ? 'ACCEPTED' :
-              attendee.responseStatus === 'declined' ? 'DECLINED' :
-                attendee.responseStatus === 'tentative' ? 'TENTATIVE' :
-                  'NEEDS-ACTION';
-            params.push(`PARTSTAT=${partstat}`);
-
-            eventLines.push(
-              `ATTENDEE;${params.join(';')}:mailto:${attendee.email}`
-            );
-          });
-        }
-
-        eventLines.push('END:VEVENT');
-
-        icsContent += '\r\n' + eventLines.map(line => foldLine(line)).join('\r\n');
-      });
-
-      icsContent += '\r\nEND:VCALENDAR';
-
-      const bom = new Uint8Array([0xEF, 0xBB, 0xBF]);
-      const blob = new Blob([bom, icsContent], {
-        type: 'text/calendar;charset=utf-8'
-      });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'calendar_events.ics';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error('Error exporting ICS:', error);
-      throw error;
-    }
+  // Helper function to render summary info from a section (used in both main row and submenu)
+  const renderSectionInfo = (section) => {
+    if (!section) return "TBA";
+    const instructorList = section.instructors
+      ?.map((inst) => inst.instructor)
+      .join(", ") || "TBA";
+    const timeLoc = section.timeLocations && section.timeLocations[0];
+    const timeInfo = timeLoc
+      ? `${timeLoc.days} ${timeLoc.beginTime}-${timeLoc.endTime}`
+      : "TBA";
+    const locationInfo = timeLoc
+      ? `${timeLoc.building} ${timeLoc.room}`
+      : "TBA";
+    return `${instructorList} | ${timeInfo} | ${locationInfo}`;
   };
+
   return (
     // Apply the dark-mode class conditionally to your main container
     <div className={`App ${darkMode ? 'dark-mode' : ''}`}>
@@ -288,51 +265,219 @@ function App() {
         </label>
       </div>
 
+      <BrowserRouter>
+        <div className="app">
+          <Routes>
+            <Route path="/App_Search" element={<BasicExample />} />
+          </Routes>
+        </div>
+      </BrowserRouter>
+
+      {/* Schedule to Google Calendar Card */}
       <div className="card">
         <h1 className="h1">Schedule to Google Calendar</h1>
-        <button className="button" onClick={() => apiCalendar.handleAuthClick()}>
+        <button
+          className="button"
+          onClick={() => apiCalendar.handleAuthClick()}
+        >
           Sign in with Google
         </button>
-        <button className="button" onClick={() => apiCalendar.handleSignoutClick()}>
+        <button
+          className="button"
+          onClick={() => apiCalendar.handleSignoutClick()}
+        >
           Sign out
         </button>
         <button className="button" onClick={listEvents}>
           Test GCAL
         </button>
-
-        <div style={{ marginTop: "1rem" }}>
-          <label htmlFor="permNumber" style={{ display: "block", marginBottom: "0.5rem" }}>
-            Enter Perm Number:
-          </label>
+        <div style={{ marginTop: "1rem", position: "relative" }}>
           <div style={{ display: "flex", gap: "0.5rem" }}>
+            {/* "Select Quarter" */}
+            <select
+              value={courseSearchQuarter}
+              onChange={(e) => setCourseSearchQuarter(e.target.value)}
+              className="input"
+            >
+              <option value="">Select Quarter</option>
+              {quarterOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            {/* "Filter Courses" */}
             <input
-              className="perm-input"
-              id="permNumber"
               type="text"
-              placeholder="Perm Number"
-              value={permNumber}
-              onChange={(e) => setPermNumber(e.target.value)}
+              className="input"
+              placeholder="Filter Courses"
+              value={courseFilter}
+              onChange={(e) => setCourseFilter(e.target.value)}
             />
-            <input
-              className="quarter-input"
-              id="quarter"
-              type="text"
-              placeholder="Quarter (YYYYQ)"
-              value={quarter}
-              onChange={(e) => setQuarter(e.target.value)}
-            />
-            <button className="button" onClick={handleSearch}>
-              Search
-            </button>
           </div>
+          {/* Dropdown showing only the top 6 filtered courses */}
+          {courseFilter && filteredCourses.length > 0 && (
+            <div
+              className="dropdown"
+              style={{
+                position: "absolute",
+                top: "100%",
+                left: 0,
+                right: 0,
+                background: "#fff",
+                zIndex: 10,
+                border: "1px solid #ccc",
+                fontSize: "0.8rem",
+                color: "#000",
+              }}
+            >
+              {filteredCourses.slice(0, 6).map((course) => {
+                // Get default section info (using the first section)
+                const defaultSection =
+                  (course.classSections && course.classSections[0]) || {};
+                // Check if a section is already selected for this course
+                const selected = getSelectedSection(course);
+                const isSelected = !!selected;
+                return (
+                  <div
+                    key={course.courseId}
+                    onMouseEnter={() => setHoveredCourseId(course.courseId)}
+                    onMouseLeave={() => setHoveredCourseId(null)}
+                    style={{
+                      padding: "0.5rem",
+                      cursor: "pointer",
+                      backgroundColor: isSelected ? "#e0e0e0" : "#fff",
+                      position: "relative",
+                    }}
+                  >
+                    {/* Main row shows course title, id and summary info from default section */}
+                    <div style={{ display: "flex", alignItems: "center" }}>
+                      <input
+                        type="checkbox"
+                        checked={isSelected}
+                        readOnly
+                        style={{ marginRight: "0.5rem" }}
+                      />
+                      <span>
+                        {course.title} ({course.courseId})
+                      </span>
+                    </div>
+                    <div style={{ fontSize: "0.75rem", marginLeft: "1.75rem" }}>
+                      {renderSectionInfo(defaultSection)}
+                      {isSelected && selected && selected.section && (
+                        <em> (Selected: Section {selected.section.section})</em>
+                      )}
+                    </div>
+                    {/* Submenu: show list of sections on hover */}
+                    {hoveredCourseId === course.courseId &&
+                      course.classSections &&
+                      course.classSections.length > 0 && (
+                        <div
+                          className="submenu"
+                          style={{
+                            position: "absolute",
+                            top: 0,
+                            left: 0,
+                            width: "300px", // wider container
+                            background: "#f9f9f9",
+                            border: "1px solid #ccc",
+                            padding: "0.5rem",
+                            zIndex: 100,
+                          }}
+                        >
+                          {course.classSections.map((section) => {
+                            // Use the first timeLocation from this section for details
+                            const timeLoc =
+                              section.timeLocations &&
+                              section.timeLocations[0] || {};
+                            const instructors = section.instructors
+                              ?.map((inst) => inst.instructor)
+                              .join(", ") || "TBA";
+                            const timeInfo = timeLoc.beginTime
+                              ? `${timeLoc.days} ${timeLoc.beginTime}-${timeLoc.endTime}`
+                              : "TBA";
+                            const locationInfo =
+                              timeLoc.building && timeLoc.room
+                                ? `${timeLoc.building} ${timeLoc.room}`
+                                : "TBA";
+                            // Check if this section is selected for the course
+                            const currentSelection = getSelectedSection(course);
+                            const isSectionSelected =
+                              currentSelection &&
+                              currentSelection.section.section === section.section;
+                            return (
+                              <div
+                                key={section.enrollCode}
+                                onClick={() =>
+                                  handleSectionSelect(course, section)
+                                }
+                                style={{
+                                  padding: "0.25rem 0.5rem",
+                                  background: isSectionSelected
+                                    ? "#d0d0d0"
+                                    : "transparent",
+                                  cursor: "pointer",
+                                  display: "flex",
+                                  alignItems: "center",
+                                }}
+                              >
+                                <input
+                                  type="checkbox"
+                                  checked={isSectionSelected}
+                                  readOnly
+                                  style={{ marginRight: "0.5rem" }}
+                                />
+                                <div>
+                                  <strong>Section {section.section}:</strong>{" "}
+                                  {instructors} | {timeInfo} | {locationInfo}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
-
-        <button className="button" onClick={addEvent}>
+        <button
+          className="button"
+          onClick={() => addEvent(selectedCourses)}
+        >
           Convert Schedule to Google Calendar
         </button>
-        <div>
-          <button className="button" onClick={generateICS}>Export as ICS</button>
-        </div>
+
+        {/* Display selected courses with chosen section details */}
+        {selectedCourses.length > 0 && (
+          <div style={{ marginTop: "1rem" }}>
+            <h2>Selected Courses:</h2>
+            <ul>
+              {selectedCourses.map(({ course, section }) => {
+                const timeLoc =
+                  section.timeLocations && section.timeLocations[0] || {};
+                const instructors = section.instructors
+                  ?.map((inst) => inst.instructor)
+                  .join(", ") || "TBA";
+                const timeInfo = timeLoc.beginTime
+                  ? `${timeLoc.days} ${timeLoc.beginTime}-${timeLoc.endTime}`
+                  : "TBA";
+                const locationInfo =
+                  timeLoc.building && timeLoc.room
+                    ? `${timeLoc.building} ${timeLoc.room}`
+                    : "TBA";
+                return (
+                  <li key={course.courseId}>
+                    {course.title} ({course.courseId}) - Section{" "}
+                    {section.section}: {instructors} | {timeInfo} |{" "}
+                    {locationInfo}
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        )}
       </div>
     </div>
   );
