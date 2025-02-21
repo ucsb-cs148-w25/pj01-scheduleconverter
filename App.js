@@ -40,9 +40,8 @@ function App() {
 
   // Google Calendar API configuration
   const config = {
-    clientId:
-      "915729068911-kfgg568j8f31i6l99phkr5ukj8b5pghe.apps.googleusercontent.com",
-    apiKey: "AIzaSyAR9EUU2RZtGvZAEMSGZp_s3qozrxB2vrI",
+    clientId: process.env.REACT_APP_GOOGLE_CLIENT_ID,
+    apiKey: process.env.REACT_APP_GOOGLE_API_KEY,
     scope: "https://www.googleapis.com/auth/calendar",
     discoveryDocs: [
       "https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest",
@@ -55,7 +54,7 @@ function App() {
   }, [darkMode]);
 
   // UCSB API key for course search
-  const apiKey = "3JXdEElm20bMv3cL5huEvZEB0W6opCo2"; // Replace with your actual UCSB API Key
+  const apiKey = process.env.REACT_APP_UCSB_API_KEY; // Replace with actual UCSB API Key
 
   const fetchCourses = async () => {
     if (!courseSearchQuarter) {
