@@ -28,3 +28,7 @@
 * Assessment:
 * Decision Going Forward:
 
+As a team, we decided that actually utilizing the Kanban board as a means of communication and task delegation would decrease the number of people overlapping tasks. Thus we clearly knew who was working on what and where they are in the process.
+
+Actually utilizing the Kanban board, rather than using it for required lab assignments has also made our standups and meetings more efficient as we immediately know who was working on what.
+
