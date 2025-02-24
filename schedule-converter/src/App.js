@@ -54,8 +54,6 @@ function App() {
   // UCSB API key for course search
   const apiKey = process.env.REACT_APP_UCSB_API_KEY; // Replace with actual UCSB API Key
 
-  console.log("API Key: ", apiKey)
-
   const fetchCourses = async () => {
     if (!courseSearchQuarter) {
       setError("Please select a valid quarter.");
