@@ -190,11 +190,11 @@ function App() {
         (section.section ? ` - Section ${section.section}` : ""),
       recurrence: [`RRULE:FREQ=WEEKLY;COUNT=${time_len * 10};BYDAY=${time.days.split(' ').filter(Boolean).map(day => dayMap[day]).join(',')}`],
       start: {
-        dateTime: new Date(year, month, 1, startHour + 8, startMinute).toISOString().slice(0, -1),
+        dateTime: new Date(year, month, 1, startHour - 8, startMinute).toISOString().slice(0, -1),
         timeZone: "America/Los_Angeles",
       },
       end: {
-        dateTime: new Date(year, month, 1, endHour + 8, endMinute).toISOString().slice(0, -1),
+        dateTime: new Date(year, month, 1, endHour - 8, endMinute).toISOString().slice(0, -1),
         timeZone: "America/Los_Angeles",
       },
     };
