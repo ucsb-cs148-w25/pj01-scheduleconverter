@@ -165,11 +165,11 @@ function App() {
   };
 
   // Google Calendar functions
-  const listEvents = () => {
-    apiCalendar.listEvents({}).then(({ result }) => {
-      console.log(result.items);
-    });
-  };
+  // const listEvents = () => {
+  //   apiCalendar.listEvents({}).then(({ result }) => {
+  //     console.log(result.items);
+  //   });
+  // };
 
   // Create event using the selected course and its chosen section.
   const createEventFromSelectedCourse = (selected) => {
@@ -288,9 +288,9 @@ function App() {
         >
           Sign out
         </button>
-        <button className="button" onClick={listEvents}>
+        {/* <button className="button" onClick={listEvents}>
           Test GCAL
-        </button>
+        </button> */}
         <div style={{ marginTop: "1rem", position: "relative" }}>
           <div style={{ display: "flex", gap: "0.5rem" }}>
             {/* "Select Quarter" */}
