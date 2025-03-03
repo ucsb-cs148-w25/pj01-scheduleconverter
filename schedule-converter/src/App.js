@@ -225,6 +225,188 @@ function App() {
     return `${instructorList} | ${timeInfo} | ${locationInfo}`;
   };
 
+
+  const generateICS = async () => {
+    try {
+      const firstPageUrl = `https://api.ucsb.edu/academics/quartercalendar/v1/quarters/current?type=lastdayoffinals`;
+      const firstResponse = await fetch(firstPageUrl, {
+        headers: { "ucsb-api-key": apiKey },
+      });
+      if (!firstResponse.ok)
+        throw new Error(`API error: ${firstResponse.status}`);
+      const firstData = await firstResponse.json();
+      const firstDay = firstData.firstDayOfClasses || [];
+      const lastDay = firstData.lastDayOfClasses || [];
+      console.log("YIPPE");
+      console.log(firstDay);
+      console.log(lastDay);
+
+      const response = await apiCalendar.listEvents({ timeMin: firstDay, timeMax: lastDay });
+      // console.log(fetchCourses());
+      const events = response.result.items || [];
+      console.log(events)
+
+      const escapeText = (text) => {
+        if (!text) return '';
+        return text
+          .replace(/[\\;,]/g, (match) => '\\' + match)
+          .replace(/\n/g, '\\n')
+          .replace(/\r/g, '\\r')
+          .replace(/[^\x20-\x7E]/g, '')
+          .replace(/"/g, '\'');
+      };
+
+      const foldLine = (line) => {
+        if (line.length <= 75) return line;
+        const parts = [];
+        let currentLine = '';
+
+        const chars = [...line];
+
+        for (const char of chars) {
+          if ((currentLine + char).length > 74) {
+            parts.push(currentLine);
+            currentLine = ' ' + char;
+          } else {
+            currentLine += char;
+          }
+        }
+        if (currentLine) parts.push(currentLine);
+
+        return parts.join('\r\n');
+      };
+
+      const timestamp = new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+      const organizerDomain = window.location.hostname || 'yourdomain.com';
+
+      let icsContent = [
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//Your Organization//Your App//EN',
+        'CALSCALE:GREGORIAN',
+        'METHOD:PUBLISH',
+        `X-WR-CALNAME:${escapeText('My Calendar')}`,
+        `X-WR-CALDESC:${escapeText('Exported Calendar')}`,
+        'X-WR-TIMEZONE:UTC',
+        'BEGIN:VTIMEZONE',
+        'TZID:UTC',
+        'BEGIN:STANDARD',
+        'DTSTART:19700101T000000Z',
+        'TZOFFSETFROM:+0000',
+        'TZOFFSETTO:+0000',
+        'END:STANDARD',
+        'END:VTIMEZONE'
+      ].join('\r\n');
+
+      events.forEach(event => {
+        if (!event.start || !event.end) return;
+
+        const uid = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}@${organizerDomain}`;
+
+        const isAllDay = Boolean(event.start.date);
+
+        let start, end;
+
+        if (isAllDay) {
+          start = event.start.date.replace(/-/g, '');
+          const endDate = new Date(event.end.date);
+          endDate.setDate(endDate.getDate() + 1);
+          end = endDate.toISOString().split('T')[0].replace(/-/g, '');
+        } else {
+          start = new Date(event.start.dateTime)
+            .toISOString()
+            .replace(/[-:]/g, '')
+            .split('.')[0] + 'Z';
+          end = new Date(event.end.dateTime)
+            .toISOString()
+            .replace(/[-:]/g, '')
+            .split('.')[0] + 'Z';
+        }
+
+        const eventLines = [
+          '',
+          'BEGIN:VEVENT',
+          `UID:${uid}`,
+          `DTSTAMP:${timestamp}`,
+          isAllDay ? `DTSTART;VALUE=DATE:${start}` : `DTSTART:${start}`,
+          isAllDay ? `DTEND;VALUE=DATE:${end}` : `DTEND:${end}`,
+          `SUMMARY:${escapeText(event.summary || 'Untitled Event')}`,
+          'CLASS:PUBLIC',
+          'SEQUENCE:0',
+          `CREATED:${timestamp}`,
+          `LAST-MODIFIED:${timestamp}`
+        ];
+
+        if (event.description?.trim()) {
+          eventLines.push(`DESCRIPTION:${escapeText(event.description)}`);
+        }
+
+        if (event.location?.trim()) {
+          eventLines.push(`LOCATION:${escapeText(event.location)}`);
+        }
+
+        if (event.status) {
+          const validStatuses = ['CONFIRMED', 'TENTATIVE', 'CANCELLED'];
+          const status = event.status.toUpperCase();
+          if (validStatuses.includes(status)) {
+            eventLines.push(`STATUS:${status}`);
+          }
+        }
+
+        if (event.organizer?.email) {
+          const organizerName = escapeText(event.organizer.displayName || event.organizer.email);
+          eventLines.push(`ORGANIZER;CN=${organizerName}:mailto:${event.organizer.email}`);
+        }
+
+        if (event.attendees?.length) {
+          event.attendees.forEach(attendee => {
+            if (!attendee.email) return;
+
+            const params = [];
+            if (attendee.displayName) {
+              params.push(`CN=${escapeText(attendee.displayName)}`);
+            }
+
+            const role = attendee.organizer ? 'CHAIR' : 'REQ-PARTICIPANT';
+            params.push(`ROLE=${role}`);
+
+            const partstat = attendee.responseStatus === 'accepted' ? 'ACCEPTED' :
+              attendee.responseStatus === 'declined' ? 'DECLINED' :
+                attendee.responseStatus === 'tentative' ? 'TENTATIVE' :
+                  'NEEDS-ACTION';
+            params.push(`PARTSTAT=${partstat}`);
+
+            eventLines.push(
+              `ATTENDEE;${params.join(';')}:mailto:${attendee.email}`
+            );
+          });
+        }
+
+        eventLines.push('END:VEVENT');
+
+        icsContent += '\r\n' + eventLines.map(line => foldLine(line)).join('\r\n');
+      });
+
+      icsContent += '\r\nEND:VCALENDAR';
+
+      const bom = new Uint8Array([0xEF, 0xBB, 0xBF]);
+      const blob = new Blob([bom, icsContent], {
+        type: 'text/calendar;charset=utf-8'
+      });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'calendar_events.ics';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error exporting ICS:', error);
+      throw error;
+    }
+  };
+
   return (
     // Apply the dark-mode class conditionally to your main container
     <div className={`App ${darkMode ? "dark-mode" : ""}`}>
@@ -483,6 +665,9 @@ function App() {
             </ul>
           </div>
         )}
+        <div>
+          <button className="button" onClick={generateICS}>Export as ICS</button>
+        </div>
       </div>
     </div>
   );
