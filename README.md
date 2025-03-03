@@ -11,6 +11,46 @@ User Roles:
 
 Link: https://fanciful-kangaroo-2eef8e.netlify.app/
 
+# Installation
+
+### Prerequisites
+- Git
+- npm
+
+Backend:
+- Database: Firebase
+- Authentication: Firebase / Google OAuth
+
+### Installation Steps
+1. **Clone the Repository**
+   ```bash
+   git clone https://github.com/ucsb-cs148-w25/pj01-scheduleconverter
+   ```
+
+2. **Navigate to the Project Directory**
+   ```bash
+   cd pj01-scheduleconverter
+   ```
+
+3. **Install Dependencies**
+   ```bash
+   npm install
+   ```
+
+4. Create a .env file in the /schedule-converter folder with the following environmental variables:
+    ```
+    REACT_APP_GOOGLE_CLIENT_ID=<your_id>
+    REACT_APP_GOOGLE_CLIENT_SECRET=<your_id>
+    REACT_APP_GOOGLE_API_KEY=<your_id>
+    REACT_APP_UCSB_API_KEY=<your_id>
+    ```
+
+5. Run locally: 
+    ```bash
+    npm start
+    ```
+6. Visit site at `http://localhost:3000`
+
 | Name          | GitHub IDs          |
 |--------------------|-------------------|
 | Abby Fan         | Abby-Fan04        |
