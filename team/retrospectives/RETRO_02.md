@@ -25,6 +25,11 @@
 ## Experiment/Change
 
 * Description: Our experiment based on this retro is to have everybody add/move an item through the kanban board every week
-* Assessment:
-* Decision Going Forward:
+* Assessment: As a team, we decided that actually utilizing the Kanban board as a means of communication and task delegation would decrease the number of people overlapping tasks. Thus we clearly knew who was working on what and where they are in the process.
+* Decision Going Forward: Actually utilizing the Kanban board
+
+The outcome of this experiment is that it has also made our standups and meetings more efficient as we immediately know who was working on what. It reduces miscommunication within the team by a lot. And as such, we conclude to continue this practice.
+
+
+
 

@@ -165,40 +165,36 @@ function App() {
   };
 
   // Google Calendar functions
-  const listEvents = () => {
-    apiCalendar.listEvents({}).then(({ result }) => {
-      console.log(result.items);
-    });
-  };
+  // const listEvents = () => {
+  //   apiCalendar.listEvents({}).then(({ result }) => {
+  //     console.log(result.items);
+  //   });
+  // };
 
   // Create event using the selected course and its chosen section.
   const createEventFromSelectedCourse = (selected) => {
+    console.log(selected)
     const { course, section } = selected;
     // Use the first timeLocation from the section
     const time = section.timeLocations[0];
     const year = parseInt(course.quarter.slice(0, 4));
-    const quarterMap = { W: 0, S: 3, M: 6, F: 9 };
+    const quarterMap = { 1: 0, 2: 3, 3: 6, 4: 9 };
     const month = quarterMap[course.quarter.slice(-1)];
     const [startHour, startMinute] = time.beginTime.split(":").map(Number);
     const [endHour, endMinute] = time.endTime.split(":").map(Number);
     const dayMap = { M: "MO", T: "TU", W: "WE", R: "TH", F: "FR" };
-    const time_len = time.days.split(" ").length;
+    const time_len = time.days.split(" ").filter(Boolean).length;
     return {
       summary:
         course.title +
         (section.section ? ` - Section ${section.section}` : ""),
-      recurrence: [
-        `RRULE:FREQ=WEEKLY;COUNT=${time_len * 10};BYDAY=${time.days
-          .split(" ")
-          .map((day) => dayMap[day])
-          .join(",")}`,
-      ],
+      recurrence: [`RRULE:FREQ=WEEKLY;COUNT=${time_len * 10};BYDAY=${time.days.split(' ').filter(Boolean).map(day => dayMap[day]).join(',')}`],
       start: {
-        dateTime: new Date(year, month, 1, startHour, startMinute).toISOString(),
+        dateTime: new Date(year, month, 1, startHour - 8, startMinute).toISOString().slice(0, -1),
         timeZone: "America/Los_Angeles",
       },
       end: {
-        dateTime: new Date(year, month, 1, endHour, endMinute).toISOString(),
+        dateTime: new Date(year, month, 1, endHour - 8, endMinute).toISOString().slice(0, -1),
         timeZone: "America/Los_Angeles",
       },
     };
@@ -228,6 +224,15 @@ function App() {
       : "TBA";
     return `${instructorList} | ${timeInfo} | ${locationInfo}`;
   };
+
+  const deleteCourse = async (selectedCourses, courseId) => {
+    const updatedCourses = selectedCourses.filter(
+      (selected) => selected.course.courseId !== courseId
+    );
+    setSelectedCourses(updatedCourses);
+    console.log("Deleted course: " + courseId);
+  };
+
 
   return (
     // Apply the dark-mode class conditionally to your main container
@@ -479,6 +484,11 @@ function App() {
                       <p>Instructors: {instructors}</p>
                       <p>Time: {timeInfo}</p>
                       <p>Location: {locationInfo}</p>
+                      <button
+                      className="button"
+                      onClick={() => deleteCourse(selectedCourses, course.courseId)}>
+                      Delete Course
+                      </button>
                     </div>
                   );
                 })}
