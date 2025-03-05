@@ -25,7 +25,7 @@ Link: https://fanciful-kangaroo-2eef8e.netlify.app/
 
 2. **Navigate to the Project Directory**
    ```bash
-   cd pj01-scheduleconverter
+   cd pj01-scheduleconverter/schedule-converter
    ```
 
 3. **Install Dependencies**
