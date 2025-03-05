@@ -55,6 +55,13 @@ body {
   background-color: #2a65cc;
 }
 
+/* Style the header with a grey background and some padding */
+.header {
+  overflow: hidden;
+  background-color: #f1f1f1;
+  padding: 20px 10px;
+}
+
 /* Input styles */
 .input {
   flex: 1;
@@ -69,6 +76,14 @@ label {
   font-size: 1rem;
   margin-bottom: 0.5rem;
   display: block;
+}
+
+/* Dropdown styles */
+.dropdown {
+  background-color: #fff;
+  border: 1px solid #ccc;
+  position: "absolute";
+  top: "100%";
 }
 
 /* Dark mode styles */
@@ -92,6 +107,12 @@ label {
 
 .dark-mode .button:active {
   background-color: #777;
+}
+
+.dark-mode .dropdown {
+  background-color: #000000;
+  border-color: #555;
+  color: #f3f3f3;
 }
 
 /* From Uiverse.io by Galahhad */ 
