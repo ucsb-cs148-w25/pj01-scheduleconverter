@@ -17,10 +17,6 @@ Link: https://fanciful-kangaroo-2eef8e.netlify.app/
 - Git
 - npm
 
-Backend:
-- Database: Firebase
-- Authentication: Firebase / Google OAuth
-
 ### Installation Steps
 1. **Clone the Repository**
    ```bash
