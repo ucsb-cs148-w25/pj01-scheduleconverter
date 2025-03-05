@@ -233,9 +233,10 @@ function App() {
     // Apply the dark-mode class conditionally to your main container
     <div className={`App ${darkMode ? "dark-mode" : ""}`}>
       {/* New custom switch positioned above the card */}
+      {/* <h1 className="h1"style={{ position: "absolute", top: "1rem", left: "2rem" }}>Schedule to Google Calendar</h1> */}
       <div
         className="switch-container"
-        style={{ position: "absolute", top: "1rem", right: "1rem" }}
+        style={{ position: "absolute", top: "1rem", right: "2rem" }}
       >
         <label className="theme-switch">
           <input
@@ -274,8 +275,10 @@ function App() {
       </div>
 
       {/* Schedule to Google Calendar Card */}
-      <div className="card">
-        <h1 className="h1">Schedule to Google Calendar</h1>
+      <div style={{ display: "flex" }}>
+      {/* Left Card */}
+      <div className="card" style={{ flex: "1", marginRight: "1rem", height: "100vh", position: "fixed", left: 0, top: 0, padding: "1rem", boxSizing: "border-box", width: "25rem" }}>
+        <h1>Schedule to Google Calendar</h1>
         <button
           className="button"
           onClick={() => apiCalendar.handleAuthClick()}
@@ -287,9 +290,6 @@ function App() {
           onClick={() => apiCalendar.handleSignoutClick()}
         >
           Sign out
-        </button>
-        <button className="button" onClick={listEvents}>
-          Test GCAL
         </button>
         <div style={{ marginTop: "1rem", position: "relative" }}>
           <div style={{ display: "flex", gap: "0.5rem" }}>
@@ -330,13 +330,6 @@ function App() {
               style={{
                 position: "absolute",
                 top: "100%",
-                left: 0,
-                right: 0,
-                background: "#fff",
-                zIndex: 10,
-                border: "1px solid #ccc",
-                fontSize: "0.8rem",
-                color: "#000",
               }}
             >
               {filteredCourses.slice(0, 6).map((course) => {
@@ -458,35 +451,41 @@ function App() {
         >
           Convert Schedule to Google Calendar
         </button>
+        </div>
 
         {/* Display selected courses with chosen section details */}
-        {selectedCourses.length > 0 && (
-          <div style={{ marginTop: "1rem" }}>
-            <h2>Selected Courses:</h2>
-            <ul>
-              {selectedCourses.map(({ course, section }) => {
-                const timeLoc = section.timeLocations?.[0] || {};
-                const instructors =
-                  section.instructors
-                    ?.map((inst) => inst.instructor)
-                    .join(", ") || "TBA";
-                const timeInfo = timeLoc.beginTime
-                  ? `${timeLoc.days} ${timeLoc.beginTime}-${timeLoc.endTime}`
-                  : "TBA";
-                const locationInfo =
-                  timeLoc.building && timeLoc.room
-                    ? `${timeLoc.building} ${timeLoc.room}`
+        <div style={{ flex: "2", marginLeft: "27rem", padding: "1rem", boxSizing: "border-box", width: "calc(100% - 27rem)" }}>
+          {selectedCourses.length > 0 && (
+            <div>
+              <h2>Selected Courses:</h2>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "1rem" }}>
+                {selectedCourses.map(({ course, section }) => {
+                  const timeLoc = section.timeLocations?.[0] || {};
+                  const instructors =
+                    section.instructors
+                      ?.map((inst) => inst.instructor)
+                      .join(", ") || "TBA";
+                  const timeInfo = timeLoc.beginTime
+                    ? `${timeLoc.days} ${timeLoc.beginTime}-${timeLoc.endTime}`
                     : "TBA";
-                return (
-                  <li key={course.courseId}>
-                    {course.title} ({course.courseId}) - Section{" "}
-                    {section.section}: {instructors} | {timeInfo} | {locationInfo}
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-        )}
+                  const locationInfo =
+                    timeLoc.building && timeLoc.room
+                      ? `${timeLoc.building} ${timeLoc.room}`
+                      : "TBA";
+                  return (
+                    <div key={course.courseId} className="card" style={{ padding: "1rem", boxSizing: "border-box", width: "calc(33.33% - 1rem)" }}>
+                      <h3>{course.title} ({course.courseId})</h3>
+                      <p>Section {section.section}</p>
+                      <p>Instructors: {instructors}</p>
+                      <p>Time: {timeInfo}</p>
+                      <p>Location: {locationInfo}</p>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
