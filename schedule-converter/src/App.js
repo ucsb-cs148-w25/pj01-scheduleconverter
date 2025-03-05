@@ -225,6 +225,15 @@ function App() {
     return `${instructorList} | ${timeInfo} | ${locationInfo}`;
   };
 
+  const deleteCourse = async (selectedCourses, courseId) => {
+    const updatedCourses = selectedCourses.filter(
+      (selected) => selected.course.courseId !== courseId
+    );
+    setSelectedCourses(updatedCourses);
+    console.log("Deleted course: " + courseId);
+  };
+
+
   return (
     // Apply the dark-mode class conditionally to your main container
     <div className={`App ${darkMode ? "dark-mode" : ""}`}>
@@ -477,6 +486,12 @@ function App() {
                   <li key={course.courseId}>
                     {course.title} ({course.courseId}) - Section{" "}
                     {section.section}: {instructors} | {timeInfo} | {locationInfo}
+                    <button
+                      className="button"
+                      onClick={() => deleteCourse(selectedCourses, course.courseId)}
+                    >
+                      Delete Course
+                    </button>
                   </li>
                 );
               })}
