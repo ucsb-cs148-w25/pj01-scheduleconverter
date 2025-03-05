@@ -331,11 +331,7 @@ function App() {
           {/* Dropdown showing only the top 6 filtered courses */}
           {courseFilter && filteredCourses.length > 0 && (
             <div
-              className="dropdown"
-              style={{
-                position: "absolute",
-                top: "100%",
-              }}
+              className={`dropdown ${darkMode ? "dark-mode" : ""}`}
             >
               {filteredCourses.slice(0, 6).map((course) => {
                 // Get default section info (using the first section)
@@ -352,8 +348,9 @@ function App() {
                     style={{
                       padding: "0.5rem",
                       cursor: "pointer",
-                      backgroundColor: isSelected ? "#e0e0e0" : "#fff",
+                      backgroundColor: isSelected ? (darkMode ? "#FEBC11" : "#e0e0e0") : (darkMode ? "#333" : "#fff"),
                       position: "relative",
+                      color: darkMode ? "#f3f3f3" : "#000",
                     }}
                   >
                     {/* Main row shows course title, id and summary info from default section */}
@@ -388,10 +385,11 @@ function App() {
                             top: 0,
                             left: 0,
                             width: "300px", // wider container
-                            background: "#f9f9f9",
+                            background: darkMode ? "#333" : "#f9f9f9",
                             border: "1px solid #ccc",
                             padding: "0.5rem",
                             zIndex: 100,
+                            color: darkMode ? "#f3f3f3" : "#000",
                           }}
                         >
                           {course.classSections.map((section) => {
@@ -422,11 +420,12 @@ function App() {
                                 style={{
                                   padding: "0.25rem 0.5rem",
                                   background: isSectionSelected
-                                    ? "#d0d0d0"
+                                    ? (darkMode ? "#FEBC11" : "#d0d0d0")
                                     : "transparent",
                                   cursor: "pointer",
                                   display: "flex",
                                   alignItems: "center",
+                                  color: darkMode ? "#f3f3f3" : "#000",
                                 }}
                               >
                                 <input

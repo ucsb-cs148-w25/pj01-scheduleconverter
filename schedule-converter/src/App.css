@@ -78,6 +78,14 @@ label {
   display: block;
 }
 
+/* Dropdown styles */
+.dropdown {
+  background-color: #fff;
+  border: 1px solid #ccc;
+  position: "absolute";
+  top: "100%";
+}
+
 /* Dark mode styles */
 .App.dark-mode {
   background-color: #111517;
@@ -99,6 +107,12 @@ label {
 
 .dark-mode .button:active {
   background-color: #777;
+}
+
+.dark-mode .dropdown {
+  background-color: #000000;
+  border-color: #555;
+  color: #f3f3f3;
 }
 
 /* From Uiverse.io by Galahhad */ 
