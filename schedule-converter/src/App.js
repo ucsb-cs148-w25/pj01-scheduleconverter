@@ -224,6 +224,14 @@ function App() {
       : "TBA";
     return `${instructorList} | ${timeInfo} | ${locationInfo}`;
   };
+  const deleteCourse = async (selectedCourses, courseId) => {
+    const updatedCourses = selectedCourses.filter(
+      (selected) => selected.course.courseId !== courseId
+    );
+    setSelectedCourses(updatedCourses);
+    console.log("Deleted course: " + courseId);
+  };
+
 
 
   const generateICS = async () => {
@@ -406,6 +414,7 @@ function App() {
       throw error;
     }
   };
+
 
   return (
     // Apply the dark-mode class conditionally to your main container
@@ -659,6 +668,12 @@ function App() {
                   <li key={course.courseId}>
                     {course.title} ({course.courseId}) - Section{" "}
                     {section.section}: {instructors} | {timeInfo} | {locationInfo}
+                    <button
+                      className="button"
+                      onClick={() => deleteCourse(selectedCourses, course.courseId)}
+                    >
+                      Delete Course
+                    </button>
                   </li>
                 );
               })}
