@@ -35,6 +35,7 @@ function App() {
   const [selectedCourses, setSelectedCourses] = useState([]);
   // For tracking hover state (by courseId)
   const [hoveredCourseId, setHoveredCourseId] = useState(null);
+  const [isSignedIn, setIsSignedIn] = useState(false);
 
   // Google Calendar API configuration
   const config = {
@@ -50,6 +51,23 @@ function App() {
   useEffect(() => {
     localStorage.setItem("theme", darkMode ? "dark" : "light");
   }, [darkMode]);
+
+  useEffect(() => {
+    setIsSignedIn(apiCalendar.sign);
+  }, [apiCalendar.sign]);
+
+  const handleAuthClick = () => {
+    apiCalendar.handleAuthClick().then(() => {
+      setIsSignedIn(apiCalendar.sign);
+    }).catch(() => {
+      setIsSignedIn(false);
+    });
+  };
+
+  const handleSignoutClick = () => {
+    apiCalendar.handleSignoutClick();
+    setIsSignedIn(false);
+  };
 
   // UCSB API key for course search
   const apiKey = process.env.REACT_APP_UCSB_API_KEY; // Replace with actual UCSB API Key
@@ -284,18 +302,15 @@ function App() {
       {/* Left Card */}
       <div className="card" style={{ flex: "1", marginRight: "1rem", height: "100vh", position: "fixed", left: 0, top: 0, padding: "1rem", boxSizing: "border-box", width: "25rem" }}>
         <h1>Schedule to Google Calendar</h1>
-        <button
-          className="button"
-          onClick={() => apiCalendar.handleAuthClick()}
-        >
-          Sign in with Google
-        </button>
-        <button
-          className="button"
-          onClick={() => apiCalendar.handleSignoutClick()}
-        >
-          Sign out
-        </button>
+        {isSignedIn ? (
+          <button className="button" onClick={handleSignoutClick}>
+            Sign out
+          </button>
+        ) : (
+          <button className="button" onClick={handleAuthClick}>
+            Sign in with Google
+          </button>
+        )}
         <div style={{ marginTop: "1rem", position: "relative" }}>
           <div style={{ display: "flex", gap: "0.5rem" }}>
             {/* "Select Quarter" */}
