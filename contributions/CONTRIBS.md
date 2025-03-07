@@ -16,6 +16,8 @@
 
 <!-- Yungong -->
 ## Yungong
+- In-code contributions: created a fake database, fixed some API connection issues, add some integration tests
+- Documentation contributions: made MVP videso and user manual document
 
 <!-- Christian -->
 ## Christian
