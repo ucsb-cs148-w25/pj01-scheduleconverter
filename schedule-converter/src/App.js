@@ -250,7 +250,8 @@ function App() {
       console.log(lastDay);
 
       const response = await apiCalendar.listEvents({ timeMin: firstDay, timeMax: lastDay });
-      // console.log(fetchCourses());
+      console.log("HEELP HEELPPP MEEEEEEE HEELLPPPPPPPPP MEEEEEE HEEEEEELPPPPP HELLLLLLLLLLLLPPPPPPPPPPPPPPPPPPPPP");
+      console.log(fetchCourses());
       const events = response.result.items || [];
       console.log(events)
 
@@ -283,7 +284,6 @@ function App() {
 
         return parts.join('\r\n');
       };
-
       const timestamp = new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
       const organizerDomain = window.location.hostname || 'yourdomain.com';
 
@@ -330,7 +330,6 @@ function App() {
             .replace(/[-:]/g, '')
             .split('.')[0] + 'Z';
         }
-
         const eventLines = [
           '',
           'BEGIN:VEVENT',
@@ -396,7 +395,6 @@ function App() {
       });
 
       icsContent += '\r\nEND:VCALENDAR';
-
       const bom = new Uint8Array([0xEF, 0xBB, 0xBF]);
       const blob = new Blob([bom, icsContent], {
         type: 'text/calendar;charset=utf-8'
