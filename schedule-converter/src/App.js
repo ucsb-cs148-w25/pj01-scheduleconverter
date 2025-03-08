@@ -35,6 +35,7 @@ function App() {
   const [selectedCourses, setSelectedCourses] = useState([]);
   // For tracking hover state (by courseId)
   const [hoveredCourseId, setHoveredCourseId] = useState(null);
+  const [isSignedIn, setIsSignedIn] = useState(false);
 
   // Google Calendar API configuration
   const config = {
@@ -50,6 +51,23 @@ function App() {
   useEffect(() => {
     localStorage.setItem("theme", darkMode ? "dark" : "light");
   }, [darkMode]);
+
+  useEffect(() => {
+    setIsSignedIn(apiCalendar.sign);
+  }, [apiCalendar.sign]);
+
+  const handleAuthClick = () => {
+    apiCalendar.handleAuthClick().then(() => {
+      setIsSignedIn(apiCalendar.sign);
+    }).catch(() => {
+      setIsSignedIn(false);
+    });
+  };
+
+  const handleSignoutClick = () => {
+    apiCalendar.handleSignoutClick();
+    setIsSignedIn(false);
+  };
 
   // UCSB API key for course search
   const apiKey = process.env.REACT_APP_UCSB_API_KEY; // Replace with actual UCSB API Key
@@ -173,32 +191,28 @@ function App() {
 
   // Create event using the selected course and its chosen section.
   const createEventFromSelectedCourse = (selected) => {
+    console.log(selected)
     const { course, section } = selected;
     // Use the first timeLocation from the section
     const time = section.timeLocations[0];
     const year = parseInt(course.quarter.slice(0, 4));
-    const quarterMap = { W: 0, S: 3, M: 6, F: 9 };
+    const quarterMap = { 1: 0, 2: 3, 3: 6, 4: 9 };
     const month = quarterMap[course.quarter.slice(-1)];
     const [startHour, startMinute] = time.beginTime.split(":").map(Number);
     const [endHour, endMinute] = time.endTime.split(":").map(Number);
     const dayMap = { M: "MO", T: "TU", W: "WE", R: "TH", F: "FR" };
-    const time_len = time.days.split(" ").length;
+    const time_len = time.days.split(" ").filter(Boolean).length;
     return {
       summary:
         course.title +
         (section.section ? ` - Section ${section.section}` : ""),
-      recurrence: [
-        `RRULE:FREQ=WEEKLY;COUNT=${time_len * 10};BYDAY=${time.days
-          .split(" ")
-          .map((day) => dayMap[day])
-          .join(",")}`,
-      ],
+      recurrence: [`RRULE:FREQ=WEEKLY;COUNT=${time_len * 10};BYDAY=${time.days.split(' ').filter(Boolean).map(day => dayMap[day]).join(',')}`],
       start: {
-        dateTime: new Date(year, month, 1, startHour, startMinute).toISOString(),
+        dateTime: new Date(year, month, 1, startHour - 8, startMinute).toISOString().slice(0, -1),
         timeZone: "America/Los_Angeles",
       },
       end: {
-        dateTime: new Date(year, month, 1, endHour, endMinute).toISOString(),
+        dateTime: new Date(year, month, 1, endHour - 8, endMinute).toISOString().slice(0, -1),
         timeZone: "America/Los_Angeles",
       },
     };
@@ -229,13 +243,23 @@ function App() {
     return `${instructorList} | ${timeInfo} | ${locationInfo}`;
   };
 
+  const deleteCourse = async (selectedCourses, courseId) => {
+    const updatedCourses = selectedCourses.filter(
+      (selected) => selected.course.courseId !== courseId
+    );
+    setSelectedCourses(updatedCourses);
+    console.log("Deleted course: " + courseId);
+  };
+
+
   return (
     // Apply the dark-mode class conditionally to your main container
     <div className={`App ${darkMode ? "dark-mode" : ""}`}>
       {/* New custom switch positioned above the card */}
+      {/* <h1 className="h1"style={{ position: "absolute", top: "1rem", left: "2rem" }}>Schedule to Google Calendar</h1> */}
       <div
         className="switch-container"
-        style={{ position: "absolute", top: "1rem", right: "1rem" }}
+        style={{ position: "absolute", top: "1rem", right: "2rem" }}
       >
         <label className="theme-switch">
           <input
@@ -274,23 +298,19 @@ function App() {
       </div>
 
       {/* Schedule to Google Calendar Card */}
-      <div className="card">
-        <h1 className="h1">Schedule to Google Calendar</h1>
-        <button
-          className="button"
-          onClick={() => apiCalendar.handleAuthClick()}
-        >
-          Sign in with Google
-        </button>
-        <button
-          className="button"
-          onClick={() => apiCalendar.handleSignoutClick()}
-        >
-          Sign out
-        </button>
-        {/* <button className="button" onClick={listEvents}>
-          Test GCAL
-        </button> */}
+      <div style={{ display: "flex" }}>
+      {/* Left Card */}
+      <div className="card" style={{ flex: "1", marginRight: "1rem", height: "100vh", position: "fixed", left: 0, top: 0, padding: "1rem", boxSizing: "border-box", width: "25rem" }}>
+        <h1>Schedule to Google Calendar</h1>
+        {isSignedIn ? (
+          <button className="button" onClick={handleSignoutClick}>
+            Sign out
+          </button>
+        ) : (
+          <button className="button" onClick={handleAuthClick}>
+            Sign in with Google
+          </button>
+        )}
         <div style={{ marginTop: "1rem", position: "relative" }}>
           <div style={{ display: "flex", gap: "0.5rem" }}>
             {/* "Select Quarter" */}
@@ -326,18 +346,7 @@ function App() {
           {/* Dropdown showing only the top 6 filtered courses */}
           {courseFilter && filteredCourses.length > 0 && (
             <div
-              className="dropdown"
-              style={{
-                position: "absolute",
-                top: "100%",
-                left: 0,
-                right: 0,
-                background: "#fff",
-                zIndex: 10,
-                border: "1px solid #ccc",
-                fontSize: "0.8rem",
-                color: "#000",
-              }}
+              className={`dropdown ${darkMode ? "dark-mode" : ""}`}
             >
               {filteredCourses.slice(0, 6).map((course) => {
                 // Get default section info (using the first section)
@@ -354,8 +363,9 @@ function App() {
                     style={{
                       padding: "0.5rem",
                       cursor: "pointer",
-                      backgroundColor: isSelected ? "#e0e0e0" : "#fff",
+                      backgroundColor: isSelected ? (darkMode ? "#FEBC11" : "#e0e0e0") : (darkMode ? "#333" : "#fff"),
                       position: "relative",
+                      color: darkMode ? "#f3f3f3" : "#000",
                     }}
                   >
                     {/* Main row shows course title, id and summary info from default section */}
@@ -390,10 +400,11 @@ function App() {
                             top: 0,
                             left: 0,
                             width: "300px", // wider container
-                            background: "#f9f9f9",
+                            background: darkMode ? "#333" : "#f9f9f9",
                             border: "1px solid #ccc",
                             padding: "0.5rem",
                             zIndex: 100,
+                            color: darkMode ? "#f3f3f3" : "#000",
                           }}
                         >
                           {course.classSections.map((section) => {
@@ -424,11 +435,12 @@ function App() {
                                 style={{
                                   padding: "0.25rem 0.5rem",
                                   background: isSectionSelected
-                                    ? "#d0d0d0"
+                                    ? (darkMode ? "#FEBC11" : "#d0d0d0")
                                     : "transparent",
                                   cursor: "pointer",
                                   display: "flex",
                                   alignItems: "center",
+                                  color: darkMode ? "#f3f3f3" : "#000",
                                 }}
                               >
                                 <input
@@ -458,35 +470,46 @@ function App() {
         >
           Convert Schedule to Google Calendar
         </button>
+        </div>
 
         {/* Display selected courses with chosen section details */}
-        {selectedCourses.length > 0 && (
-          <div style={{ marginTop: "1rem" }}>
-            <h2>Selected Courses:</h2>
-            <ul>
-              {selectedCourses.map(({ course, section }) => {
-                const timeLoc = section.timeLocations?.[0] || {};
-                const instructors =
-                  section.instructors
-                    ?.map((inst) => inst.instructor)
-                    .join(", ") || "TBA";
-                const timeInfo = timeLoc.beginTime
-                  ? `${timeLoc.days} ${timeLoc.beginTime}-${timeLoc.endTime}`
-                  : "TBA";
-                const locationInfo =
-                  timeLoc.building && timeLoc.room
-                    ? `${timeLoc.building} ${timeLoc.room}`
+        <div style={{ flex: "2", marginLeft: "27rem", padding: "1rem", boxSizing: "border-box", width: "calc(100% - 27rem)" }}>
+          {selectedCourses.length > 0 && (
+            <div>
+              <h2>Selected Courses:</h2>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "1rem" }}>
+                {selectedCourses.map(({ course, section }) => {
+                  const timeLoc = section.timeLocations?.[0] || {};
+                  const instructors =
+                    section.instructors
+                      ?.map((inst) => inst.instructor)
+                      .join(", ") || "TBA";
+                  const timeInfo = timeLoc.beginTime
+                    ? `${timeLoc.days} ${timeLoc.beginTime}-${timeLoc.endTime}`
                     : "TBA";
-                return (
-                  <li key={course.courseId}>
-                    {course.title} ({course.courseId}) - Section{" "}
-                    {section.section}: {instructors} | {timeInfo} | {locationInfo}
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-        )}
+                  const locationInfo =
+                    timeLoc.building && timeLoc.room
+                      ? `${timeLoc.building} ${timeLoc.room}`
+                      : "TBA";
+                  return (
+                    <div key={course.courseId} className="card" style={{ padding: "1rem", boxSizing: "border-box", width: "calc(33.33% - 1rem)" }}>
+                      <h3>{course.title} ({course.courseId})</h3>
+                      <p>Section {section.section}</p>
+                      <p>Instructors: {instructors}</p>
+                      <p>Time: {timeInfo}</p>
+                      <p>Location: {locationInfo}</p>
+                      <button
+                      className="button"
+                      onClick={() => deleteCourse(selectedCourses, course.courseId)}>
+                      Delete Course
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
