@@ -2,6 +2,9 @@
 
 <!-- Nathan -->
 ## Nathan
+ - In-code contributions: Correction to license and removal of test, minor fixes to overall project.
+ - Documentation contributions: Lead multiple standups and made progress on several lab deliverables, leading deployment documentation.
+ - General contributions: Presented ideas for project direction, debugged and discovered multiple issues, researched UCSB APIs and their functionality.
 
 <!-- Bharat -->
 ## Bharat
@@ -12,6 +15,7 @@
  - Developed initial workings for Google OAuth on our website and the Google Cloud
     - Made a working Sign In with Google button
         - (specifically UCSB email accounts only)
+
 <!-- Gio -->
 ## Gio
  * Added theming to site (dark mode)
@@ -38,7 +42,6 @@
 - Implemented drop-down quarter and class search/select functionality.
 - Led second retrospective.
 - Led standup according to group rotation.
-
 
 <!-- Ashton -->
 ## Ashton
