@@ -13,6 +13,10 @@ const quarterOptions = [
   { label: "Fall 2023", value: "20234" },
 ];
 
+const options = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10','11'];
+const colors_light = ['', '#A4BDFC', '#7AE7BF', '#DBADFF', '#FF887C', '#FBD75B', '#FFB878', '#46D6DB', '#E1E1E1', '#5484ED', '#51B749', '#DC2127'];
+// const colors_dark = [];
+
 function App() {
   // Theme state
   const [darkMode, setDarkMode] = useState(() => {
@@ -36,6 +40,8 @@ function App() {
   // For tracking hover state (by courseId)
   const [hoveredCourseId, setHoveredCourseId] = useState(null);
   const [isSignedIn, setIsSignedIn] = useState(false);
+  const [checkboxStates, setCheckboxStates] = useState({});
+
 
   // Google Calendar API configuration
   const config = {
@@ -202,6 +208,7 @@ function App() {
     const [endHour, endMinute] = time.endTime.split(":").map(Number);
     const dayMap = { M: "MO", T: "TU", W: "WE", R: "TH", F: "FR" };
     const time_len = time.days.split(" ").filter(Boolean).length;
+    const color_Id = selected.color;
     return {
       summary:
         course.title +
@@ -215,6 +222,7 @@ function App() {
         dateTime: new Date(year, month, 1, endHour - 8, endMinute).toISOString().slice(0, -1),
         timeZone: "America/Los_Angeles",
       },
+      colorId: color_Id,
     };
   };
 
@@ -251,7 +259,20 @@ function App() {
     console.log("Deleted course: " + courseId);
   };
 
-
+  function onColorChange(courseId, i) {
+    setCheckboxStates((prev) => ({
+      ...prev,
+      [courseId]: i === prev[courseId] ? null : i,
+    }));
+    setSelectedCourses((prev) =>
+      prev.map((selected) =>
+        selected.course.courseId === courseId
+          ? { ...selected, color: i }
+          : selected
+      )
+    );
+  }
+  
   return (
     // Apply the dark-mode class conditionally to your main container
     <div className={`App ${darkMode ? "dark-mode" : ""}`}>
@@ -491,6 +512,7 @@ function App() {
                     timeLoc.building && timeLoc.room
                       ? `${timeLoc.building} ${timeLoc.room}`
                       : "TBA";
+                  const selectedCheckboxIndex = checkboxStates[course.courseId] || null;
                   return (
                     <div key={course.courseId} className="card" style={{ padding: "1rem", boxSizing: "border-box", width: "calc(33.33% - 1rem)" }}>
                       <h3>{course.title} ({course.courseId})</h3>
@@ -499,10 +521,21 @@ function App() {
                       <p>Time: {timeInfo}</p>
                       <p>Location: {locationInfo}</p>
                       <button
-                      className="button"
-                      onClick={() => deleteCourse(selectedCourses, course.courseId)}>
-                      Delete Course
+                        className="button"
+                        onClick={() => deleteCourse(selectedCourses, course.courseId)}>
+                        Delete Course
                       </button>
+                      <p>Event Color: </p>
+                      {options.map((o, i) => (
+                        <div key={i} style={{ display: 'inline-block', padding: '2px', backgroundColor: colors_light[i] }}>
+                          <input
+                            type="checkbox"
+                            checked={i === selectedCheckboxIndex}
+                            onChange={() => onColorChange(course.courseId, i)}
+                            style={{ accentColor: colors_light[i] }}
+                          />
+                        </div>
+                      ))}
                     </div>
                   );
                 })}
