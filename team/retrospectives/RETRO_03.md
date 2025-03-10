@@ -25,5 +25,7 @@
 ## Experiment/Change
 
 * Description: In this experiment, we want to make sure that each member has a task under "In Progress" so that we know the progress of each member and make sure that all of us are on track.
-* Assessment: 
-* Decision Going Forward: 
+* Assessment: As a team, we would check if each member has an event that is in progress.
+* Decision Going Forward: As a team, we check and decide if each member has a task in progress or not by more actively utilizing the Kanban Board
+
+The outcome of this experiment is that each member is more active in finding and checking for tasks that we are completing. We should continue this progress till the Code Freeze so that we can get the most out of the project in time.
