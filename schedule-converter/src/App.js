@@ -13,8 +13,8 @@ const quarterOptions = [
   { label: "Fall 2023", value: "20234" },
 ];
 
-const options = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10','11'];
-const colors_light = ['#A4BDFC', '#7AE7BF', '#DBADFF', '#FF887C', '#FBD75B', '#FFB878', '#46D6DB', '#E1E1E1', '#5484ED', '#51B749', '#DC2127'];
+const options = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10','11'];
+const colors_light = ['', '#A4BDFC', '#7AE7BF', '#DBADFF', '#FF887C', '#FBD75B', '#FFB878', '#46D6DB', '#E1E1E1', '#5484ED', '#51B749', '#DC2127'];
 // const colors_dark = [];
 
 function App() {
@@ -210,7 +210,6 @@ function App() {
     const dayMap = { M: "MO", T: "TU", W: "WE", R: "TH", F: "FR" };
     const time_len = time.days.split(" ").filter(Boolean).length;
     const color_Id = selected.color;
-    console.log(color_Id);
     return {
       summary:
         course.title +
@@ -532,8 +531,17 @@ function App() {
                         onClick={() => deleteCourse(selectedCourses, course.courseId)}>
                         Delete Course
                       </button>
+                      <p>Event Color: </p>
                       {options.map((o, i) => (
-                        <input type="checkbox" Id = "Checkbox" checked={i === selectedCheckboxIndex} onChange={() => onColorChange(course.courseId, i)} style = {{accentColor: colors_light[i]}}/>
+                        <div key={i} style={{ display: 'inline-block', padding: '2px', backgroundColor: colors_light[i] }}>
+                          <input
+                            type="checkbox"
+                            checked={i === selectedCheckboxIndex}
+                            onChange={() => onColorChange(course.courseId, i)}
+                            style={{ accentColor: colors_light[i] }}
+                          />
+                        </div>
+                        // <input type="checkbox" Id = "Checkbox" checked={i === selectedCheckboxIndex} onChange={() => onColorChange(course.courseId, i)} style = {{accentColor: colors_light[i]}}/>
                       ))}
                     </div>
                   );
