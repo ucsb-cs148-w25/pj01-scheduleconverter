@@ -46,4 +46,3 @@ Nathan:
  - Last Time: finish adding hello world app
  - Today: finishing lab01 and doing lab02
  - Blockers: none at this moment
-

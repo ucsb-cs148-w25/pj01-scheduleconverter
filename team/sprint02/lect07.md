@@ -48,5 +48,3 @@ Nathan:
  - Yesterday: Worked on Lab04
  - Today: Working on Lab04 and MVP
  - Blockers: None at the moment
-
-

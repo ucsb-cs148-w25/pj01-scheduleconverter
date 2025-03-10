@@ -29,7 +29,3 @@
 * Decision Going Forward: Actually utilizing the Kanban board
 
 The outcome of this experiment is that it has also made our standups and meetings more efficient as we immediately know who was working on what. It reduces miscommunication within the team by a lot. And as such, we conclude to continue this practice.
-
-
-
-
