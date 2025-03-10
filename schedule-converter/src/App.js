@@ -40,7 +40,6 @@ function App() {
   // For tracking hover state (by courseId)
   const [hoveredCourseId, setHoveredCourseId] = useState(null);
   const [isSignedIn, setIsSignedIn] = useState(false);
-  //const [colorSelected, setColor] = useState(null);
   const [checkboxStates, setCheckboxStates] = useState({});
 
 
@@ -536,7 +535,6 @@ function App() {
                             style={{ accentColor: colors_light[i] }}
                           />
                         </div>
-                        // <input type="checkbox" Id = "Checkbox" checked={i === selectedCheckboxIndex} onChange={() => onColorChange(course.courseId, i)} style = {{accentColor: colors_light[i]}}/>
                       ))}
                     </div>
                   );
