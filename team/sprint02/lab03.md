@@ -44,5 +44,3 @@ Yungong:
 - Yesterday: Worked on Lab03
 - Today: Working on Lab03/Lab04 and MVP
 - Blockers: None at the moment
-
- 

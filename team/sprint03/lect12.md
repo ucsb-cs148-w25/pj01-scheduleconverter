@@ -48,3 +48,4 @@ Nathan:
  - Yesterday: Worked on Lab06, beginning Lab07, checking recent changes to project
  - Today: Working on Lab07
  - Blockers: None at the moment
+ 
