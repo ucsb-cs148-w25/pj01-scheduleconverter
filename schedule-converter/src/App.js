@@ -492,11 +492,6 @@ function App() {
         >
           Convert Schedule to Google Calendar
         </button>
-        {/* <button
-          className="button"
-          onClick={() => boolColor = true}>
-          Different Color per Course
-        </button> */}
         </div>
 
         {/* Display selected courses with chosen section details */}
