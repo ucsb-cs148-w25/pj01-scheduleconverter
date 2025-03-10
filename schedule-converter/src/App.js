@@ -348,7 +348,8 @@ function App() {
             <div
               className={`dropdown ${darkMode ? "dark-mode" : ""}`}
             >
-              {filteredCourses.slice(0, 6).map((course) => {
+              {filteredCourses.map((course) => {
+                // FLAG - Removed slice
                 // Get default section info (using the first section)
                 const defaultSection =
                   (course.classSections && course.classSections[0]) || {};
