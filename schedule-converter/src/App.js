@@ -78,6 +78,30 @@ function App() {
   // UCSB API key for course search
   const apiKey = process.env.REACT_APP_UCSB_API_KEY; // Replace with actual UCSB API Key
 
+  const fetchQuarterStartDate = async (quarter) => {
+    const url = `https://api.ucsb.edu/academics/quartercalendar/v1/quarters?quarter=${quarter}`;
+    console.log(`Fetching quarter start date from URL: ${url}`);
+    const response = await fetch(url, {
+      headers: { "ucsb-api-key": apiKey },
+    });
+    if (!response.ok) {
+      console.error(`API error: ${response.status} - ${response.statusText}`);
+      throw new Error(`API error: ${response.status}`);
+    }
+    const data = await response.json();
+    console.log('API Response:', data);
+    
+    // The API returns an array of quarters, find the matching quarter
+    const quarterData = data.find(q => q.quarter === quarter);
+    if (!quarterData) {
+      throw new Error(`Quarter ${quarter} not found in response`);
+    }
+    
+    console.log(`Fetched quarter start date: ${quarterData.firstDayOfClasses}`);
+    return quarterData.firstDayOfClasses;
+  };
+
+
   const fetchCourses = async () => {
     if (!courseSearchQuarter) {
       setError("Please select a valid quarter.");
@@ -227,9 +251,11 @@ function App() {
   };
 
   const addEvent = async (selectedCourses) => {
+    console.log(`Selected quarter: ${courseSearchQuarter}`);
+    const quarterStartDate = await fetchQuarterStartDate(courseSearchQuarter);
     for (const selected of selectedCourses) {
       apiCalendar
-        .createEvent(createEventFromSelectedCourse(selected))
+        .createEvent(createEventFromSelectedCourse(selected, quarterStartDate))
         .then(({ result }) => {
           console.log(result);
         });
