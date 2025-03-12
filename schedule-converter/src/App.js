@@ -269,6 +269,7 @@ function App() {
     const d = new Date(quarterStartDate);
     const diff = d.getTimezoneOffset();
     console.log(diff/60);
+    const reminderMinutes = reminderStates[course.courseId] || 10;
     return {
       summary: `${course.title} - Section ${section.section || ""}`,
       recurrence: [`RRULE:FREQ=WEEKLY;COUNT=${days.length * 10};BYDAY=${days.map(day => dayMap[day]).join(',')}`],
