@@ -85,7 +85,9 @@ label {
   border: 1px solid #ccc;
   position: absolute;
   top: 100%;
-  max-height: 400px; /* adjust this value as needed */
+  /* max-height: 400px;
+  min-height: 400px; */
+  height: 400px;
   overflow-y: auto;
 }
 
@@ -114,7 +116,7 @@ label {
 }
 
 .dark-mode .dropdown {
-  background-color: #000000;
+  background-color: #333333;
   border-color: #555;
   color: #f3f3f3;
 }
