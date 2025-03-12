@@ -220,7 +220,7 @@ function App() {
   // };
 
   // Create event using the selected course and its chosen section.
-  const createEventFromSelectedCourse = (selected) => {
+  const createEventFromSelectedCourse = (selected, quarterStartDate) => {
     console.log(selected)
     const { course, section } = selected;
     // Use the first timeLocation from the section
@@ -234,17 +234,20 @@ function App() {
     const time_len = time.days.split(" ").filter(Boolean).length;
     const color_Id = selected.color;
     const reminderMinutes = reminderStates[course.courseId] || 10;
+    const d = new Date(quarterStartDate);
+    const diff = d.getTimezoneOffset();
+    console.log(diff/60);
     return {
       summary:
         course.title +
         (section.section ? ` - Section ${section.section}` : ""),
       recurrence: [`RRULE:FREQ=WEEKLY;COUNT=${time_len * 10};BYDAY=${time.days.split(' ').filter(Boolean).map(day => dayMap[day]).join(',')}`],
       start: {
-        dateTime: new Date(year, month, 1, startHour - 8, startMinute).toISOString().slice(0, -1),
+        dateTime: new Date(year, month, 1, startHour - diff/60, startMinute).toISOString().slice(0, -1),
         timeZone: "America/Los_Angeles",
       },
       end: {
-        dateTime: new Date(year, month, 1, endHour - 8, endMinute).toISOString().slice(0, -1),
+        dateTime: new Date(year, month, 1, endHour - diff/60, endMinute).toISOString().slice(0, -1),
         timeZone: "America/Los_Angeles",
       },
       colorId: color_Id,
