@@ -46,8 +46,8 @@ function App() {
 
   // Google Calendar API configuration
   const config = {
-    clientId: process.env.REACT_APP_GOOGLE_CLIENT_ID,
-    apiKey: process.env.REACT_APP_GOOGLE_API_KEY,
+    clientId: "501417308414-jbudfd3caf806utp9c3t1ohl97sab491.apps.googleusercontent.com",
+    apiKey: "AIzaSyD-0ML67IBYKOTtWXhnGRZfA-rJJYq2hGw",
     scope: "https://www.googleapis.com/auth/calendar",
     discoveryDocs: [
       "https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest",
@@ -81,7 +81,7 @@ function App() {
   };
 
   // UCSB API key for course search
-  const apiKey = process.env.REACT_APP_UCSB_API_KEY; // Replace with actual UCSB API Key
+  const apiKey = "3JXdEElm20bMv3cL5huEvZEB0W6opCo2"; // Replace with actual UCSB API Key
 
   const fetchQuarterStartDate = async (quarter) => {
     const url = `https://api.ucsb.edu/academics/quartercalendar/v1/quarters?quarter=${quarter}`;
@@ -497,6 +497,8 @@ function App() {
                             top: 200,
                             left: 400,
                             width: "300px", // wider container
+                            maxHeight: "300px", // set max-height for scrollable content
+                            overflowY: "auto", // enable vertical scrolling
                             background: darkMode ? "#333" : "#f9f9f9",
                             border: "1px solid #ccc",
                             padding: "0.5rem",
@@ -598,7 +600,8 @@ function App() {
                       <p>Location: {locationInfo}</p>
                       <button
                         className="button"
-                        onClick={() => deleteCourse(selectedCourses, course.courseId)}>
+                        onClick={() => deleteCourse(selectedCourses, course.courseId)}
+                      >
                         Delete Course
                       </button>
                       <p>Event Color: </p>
@@ -645,5 +648,6 @@ function App() {
     </div>
   );
 }
+
 
 export default App;
