@@ -41,7 +41,7 @@ function App() {
   const [hoveredCourseId, setHoveredCourseId] = useState(null);
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [checkboxStates, setCheckboxStates] = useState({});
-
+  const [reminderStates, setReminderStates] = useState({});
 
   // Google Calendar API configuration
   const config = {
@@ -236,7 +236,7 @@ function App() {
     const dayMap = { M: "MO", T: "TU", W: "WE", R: "TH", F: "FR" };
     const days = time.days.split(" ").filter(Boolean);
     const color_Id = selected.color;
-  
+
     // Find the first class date after the quarter start
     let uniqueStartDate = new Date(startDate);
     let found = false;
@@ -265,6 +265,10 @@ function App() {
       ).toISOString();
     };
   
+    const reminderMinutes = reminderStates[course.courseId] || 10;
+    const d = new Date(quarterStartDate);
+    const diff = d.getTimezoneOffset();
+    console.log(diff/60);
     return {
       summary: `${course.title} - Section ${section.section || ""}`,
       recurrence: [`RRULE:FREQ=WEEKLY;COUNT=${days.length * 10};BYDAY=${days.map(day => dayMap[day]).join(',')}`],
@@ -277,6 +281,12 @@ function App() {
         timeZone: "America/Los_Angeles",
       },
       colorId: color_Id,
+      reminders: {
+        useDefault: false,
+        overrides: [
+          { method: "popup", minutes: reminderMinutes },
+        ],
+      },
     };
   };
   
@@ -476,9 +486,9 @@ function App() {
                         <div
                           className="submenu"
                           style={{
-                            position: "absolute",
-                            top: 0,
-                            left: 0,
+                            position: "fixed",
+                            top: 200,
+                            left: 400,
                             width: "300px", // wider container
                             background: darkMode ? "#333" : "#f9f9f9",
                             border: "1px solid #ccc",
@@ -595,6 +605,28 @@ function App() {
                           />
                         </div>
                       ))}
+                      <p>Reminder Minutes: </p>
+                      <input
+                        type="number"
+                        value={reminderStates[course.courseId] ?? "" }  // default is 10 minutes
+                        min="0"
+                        onChange={(e) => {
+                          const newValue = e.target.value;
+                          setReminderStates((prev) => ({
+                            ...prev,
+                            [course.courseId]: newValue === "" ? "" : parseInt(newValue, 10),
+                          }));
+                        }}
+                        onBlur={(e) => {
+                          if (e.target.value === "") {
+                            setReminderStates((prev) => ({
+                              ...prev,
+                              [course.courseId]: 10,
+                            }));
+                          }
+                        }}
+                        style={{ width: "50px" }}
+                      />
                     </div>
                   );
                 })}
