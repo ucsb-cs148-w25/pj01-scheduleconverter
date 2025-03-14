@@ -38,10 +38,11 @@ function App() {
   // Instead of storing just courses, we now store an object { course, section } per selection.
   const [selectedCourses, setSelectedCourses] = useState([]);
   // For tracking hover state (by courseId)
-  const [hoveredCourseId, setHoveredCourseId] = useState(null);
+  // const [hoveredCourseId, setHoveredCourseId] = useState(null);
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [checkboxStates, setCheckboxStates] = useState({});
   const [reminderStates, setReminderStates] = useState({});
+  const [selectedCourseId, setSelectedCourseId] = useState(null);
 
   // Google Calendar API configuration
   const config = {
@@ -61,6 +62,10 @@ function App() {
   useEffect(() => {
     setIsSignedIn(apiCalendar.sign);
   }, [apiCalendar.sign]);
+
+  useEffect(() => {
+    setSelectedCourseId(null);
+  }, [courseFilter]);
 
   const handleAuthClick = () => {
     apiCalendar.handleAuthClick().then(() => {
@@ -269,7 +274,7 @@ function App() {
     const d = new Date(quarterStartDate);
     const diff = d.getTimezoneOffset();
     console.log(diff/60);
-    const reminderMinutes = reminderStates[course.courseId] || 10;
+    // const reminderMinutes = reminderStates[course.courseId] || 10;
     return {
       summary: `${course.title} - Section ${section.section || ""}`,
       recurrence: [`RRULE:FREQ=WEEKLY;COUNT=${days.length * 10};BYDAY=${days.map(day => dayMap[day]).join(',')}`],
@@ -449,12 +454,13 @@ function App() {
                 return (
                   <div
                     key={course.courseId}
-                    onMouseEnter={() => setHoveredCourseId(course.courseId)}
-                    onMouseLeave={() => setHoveredCourseId(null)}
+                    onClick={() =>
+                      setSelectedCourseId(selectedCourseId === course.courseId ? null : course.courseId)
+                    }
                     style={{
                       padding: "0.5rem",
                       cursor: "pointer",
-                      backgroundColor: isSelected ? (darkMode ? "#FEBC11" : "#e0e0e0") : (darkMode ? "#333" : "#fff"),
+                      backgroundColor: selectedCourseId === course.courseId ? (darkMode ? "#FEBC11" : "#e0e0e0") : (darkMode ? "#333" : "#fff"),
                       position: "relative",
                       color: darkMode ? "#f3f3f3" : "#000",
                     }}
@@ -463,7 +469,7 @@ function App() {
                     <div style={{ display: "flex", alignItems: "center" }}>
                       <input
                         type="checkbox"
-                        checked={isSelected}
+                        checked={selectedCourseId === course.courseId}
                         readOnly
                         style={{ marginRight: "0.5rem" }}
                       />
@@ -481,7 +487,7 @@ function App() {
                       )}
                     </div>
                     {/* Submenu: show list of sections on hover */}
-                    {hoveredCourseId === course.courseId &&
+                    {selectedCourseId === course.courseId &&
                       course.classSections &&
                       course.classSections.length > 0 && (
                         <div
