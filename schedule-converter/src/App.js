@@ -220,34 +220,64 @@ function App() {
   // };
 
   // Create event using the selected course and its chosen section.
+  
   const createEventFromSelectedCourse = (selected, quarterStartDate) => {
-    console.log(selected)
+    console.log(selected);
     const { course, section } = selected;
-    // Use the first timeLocation from the section
+  
+    if (!section.timeLocations || section.timeLocations.length === 0) {
+      throw new Error("No time location found for the section.");
+    }
+  
     const time = section.timeLocations[0];
-    const year = parseInt(course.quarter.slice(0, 4));
-    const quarterMap = { 1: 0, 2: 3, 3: 6, 4: 9 };
-    const month = quarterMap[course.quarter.slice(-1)];
+    const startDate = new Date(quarterStartDate);
     const [startHour, startMinute] = time.beginTime.split(":").map(Number);
     const [endHour, endMinute] = time.endTime.split(":").map(Number);
     const dayMap = { M: "MO", T: "TU", W: "WE", R: "TH", F: "FR" };
-    const time_len = time.days.split(" ").filter(Boolean).length;
+    const days = time.days.split(" ").filter(Boolean);
     const color_Id = selected.color;
+
+    // Find the first class date after the quarter start
+    let uniqueStartDate = new Date(startDate);
+    let found = false;
+  
+    for (let i = 0; i < 7; i++) { // Search within the first week
+      const tempDate = new Date(startDate);
+      tempDate.setDate(startDate.getDate() + i);
+      const dayLetter = ["SU", "MO", "TU", "WE", "TH", "FR", "SA"][tempDate.getDay()];
+      
+      if (days.map(d => dayMap[d]).includes(dayLetter)) {
+        uniqueStartDate = tempDate;
+        found = true;
+        break;
+      }
+    }
+  
+    if (!found) {
+      throw new Error("No valid class start date found after the quarter start.");
+    }
+  
+    // Convert date and time to proper ISO string with timezone adjustments
+    const formatDateTime = (date, hour, minute) => {
+      date.setHours(hour, minute, 0, 0);
+      return new Date(
+        date.toLocaleString("en-US", { timeZone: "America/Los_Angeles" })
+      ).toISOString();
+    };
+  
     const reminderMinutes = reminderStates[course.courseId] || 10;
     const d = new Date(quarterStartDate);
     const diff = d.getTimezoneOffset();
     console.log(diff/60);
     return {
-      summary:
-        course.title +
-        (section.section ? ` - Section ${section.section}` : ""),
-      recurrence: [`RRULE:FREQ=WEEKLY;COUNT=${time_len * 10};BYDAY=${time.days.split(' ').filter(Boolean).map(day => dayMap[day]).join(',')}`],
+      summary: `${course.title} - Section ${section.section || ""}`,
+      recurrence: [`RRULE:FREQ=WEEKLY;COUNT=${days.length * 10};BYDAY=${days.map(day => dayMap[day]).join(',')}`],
       start: {
-        dateTime: new Date(year, month, 1, startHour - diff/60, startMinute).toISOString().slice(0, -1),
+        dateTime: formatDateTime(new Date(uniqueStartDate), startHour, startMinute),
         timeZone: "America/Los_Angeles",
       },
       end: {
-        dateTime: new Date(year, month, 1, endHour - diff/60, endMinute).toISOString().slice(0, -1),
+        dateTime: formatDateTime(new Date(uniqueStartDate), endHour, endMinute),
         timeZone: "America/Los_Angeles",
       },
       colorId: color_Id,
@@ -259,6 +289,8 @@ function App() {
       },
     };
   };
+  
+  
 
   const addEvent = async (selectedCourses) => {
     console.log(`Selected quarter: ${courseSearchQuarter}`);
