@@ -193,22 +193,32 @@ function App() {
   // When selecting a section from the sublist, update the selection for that course.
   const handleSectionSelect = (course, section) => {
     setSelectedCourses((prev) => {
-      const existing = prev.find(
-        (item) => item.course.courseId === course.courseId
-      );
-      // If same section is already selected, deselect it.
-      if (existing && existing.section.section === section.section) {
-        return prev.filter((item) => item.course.courseId !== course.courseId);
-      }
-      // Otherwise, update or add the selection.
-      if (existing) {
-        return prev.map((item) =>
-          item.course.courseId === course.courseId ? { course, section } : item
-        );
-      }
-      return [...prev, { course, section }];
+        const existing = prev.find(item => item.course.courseId === course.courseId);
+        if (existing) {
+            // Check if this section is already selected
+            const sectionExists = existing.sections.some(s => s.section === section.section);
+            if (sectionExists) {
+                // Deselect the section
+                const updatedSections = existing.sections.filter(s => s.section !== section.section);
+                // If no sections remain, remove the course entry
+                if(updatedSections.length === 0) {
+                    return prev.filter(item => item.course.courseId !== course.courseId);
+                }
+                return prev.map(item =>
+                    item.course.courseId === course.courseId ? { course, sections: updatedSections } : item
+                );
+            } else {
+                // Add the new section
+                return prev.map(item =>
+                    item.course.courseId === course.courseId ? { course, sections: [...item.sections, section] } : item
+                );
+            }
+        } else {
+            // Add new course with this section
+            return [...prev, { course, sections: [section] }];
+        }
     });
-  };
+};
 
   // Check if a course is selected and return the selected section (if any)
   const getSelectedSection = (course) => {
@@ -217,12 +227,10 @@ function App() {
     );
   };
 
-  // Google Calendar functions
-  // const listEvents = () => {
-  //   apiCalendar.listEvents({}).then(({ result }) => {
-  //     console.log(result.items);
-  //   });
-  // };
+  const getSelectedSections = (course) => {
+    const found = selectedCourses.find(item => item.course.courseId === course.courseId);
+    return found ? found.sections : [];
+};
 
   // Create event using the selected course and its chosen section.
   
@@ -301,14 +309,21 @@ function App() {
   const addEvent = async (selectedCourses) => {
     console.log(`Selected quarter: ${courseSearchQuarter}`);
     const quarterStartDate = await fetchQuarterStartDate(courseSearchQuarter);
-    for (const selected of selectedCourses) {
-      apiCalendar
-        .createEvent(createEventFromSelectedCourse(selected, quarterStartDate))
-        .then(({ result }) => {
-          console.log(result);
+    // For each course, create an event for each selected section
+    selectedCourses.forEach(selected => {
+        selected.sections.forEach(section => {
+            // Pass the single section along with its course and color info to createEventFromSelectedCourse
+            apiCalendar
+                .createEvent(createEventFromSelectedCourse({ course: selected.course, section, color: selected.color }, quarterStartDate))
+                .then(({ result }) => {
+                    console.log(result);
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
         });
-    }
-  };
+    });
+};
 
   // Helper function to render summary info from a section (used in both main row and submenu)
   const renderSectionInfo = (section) => {
@@ -520,17 +535,16 @@ function App() {
                               timeLoc.building && timeLoc.room
                                 ? `${timeLoc.building} ${timeLoc.room}`
                                 : "TBA";
-                            // Check if this section is selected for the course
-                            const currentSelection = getSelectedSection(course);
-                            const isSectionSelected =
-                              currentSelection &&
-                              currentSelection.section.section === section.section;
+                            // Check if a section is selected for the course
+                            const selectedSections = getSelectedSections(course);
+                            const isSectionSelected = selectedSections.some(s => s.section === section.section);
                             return (
                               <div
                                 key={section.enrollCode}
-                                onClick={() =>
+                                onClick={(e) => {
+                                  e.stopPropagation()
                                   handleSectionSelect(course, section)
-                                }
+                                }}
                                 style={{
                                   padding: "0.25rem 0.5rem",
                                   background: isSectionSelected
@@ -577,69 +591,61 @@ function App() {
             <div>
               <h2>Selected Courses:</h2>
               <div style={{ display: "flex", flexWrap: "wrap", gap: "1rem" }}>
-                {selectedCourses.map(({ course, section }) => {
-                  const timeLoc = section.timeLocations?.[0] || {};
-                  const instructors =
-                    section.instructors
-                      ?.map((inst) => inst.instructor)
-                      .join(", ") || "TBA";
-                  const timeInfo = timeLoc.beginTime
-                    ? `${timeLoc.days} ${timeLoc.beginTime}-${timeLoc.endTime}`
-                    : "TBA";
-                  const locationInfo =
-                    timeLoc.building && timeLoc.room
-                      ? `${timeLoc.building} ${timeLoc.room}`
-                      : "TBA";
-                  const selectedCheckboxIndex = checkboxStates[course.courseId] || null;
-                  return (
-                    <div key={course.courseId} className="card" style={{ padding: "1rem", boxSizing: "border-box", width: "calc(33.33% - 1rem)" }}>
-                      <h3>{course.title} ({course.courseId})</h3>
-                      <p>Section {section.section}</p>
-                      <p>Instructors: {instructors}</p>
-                      <p>Time: {timeInfo}</p>
-                      <p>Location: {locationInfo}</p>
-                      <button
-                        className="button"
-                        onClick={() => deleteCourse(selectedCourses, course.courseId)}
-                      >
-                        Delete Course
-                      </button>
-                      <p>Event Color: </p>
-                      {options.map((o, i) => (
-                        <div key={i} style={{ display: 'inline-block', padding: '2px', backgroundColor: colors_light[i] }}>
-                          <input
-                            type="checkbox"
-                            checked={i === selectedCheckboxIndex}
-                            onChange={() => onColorChange(course.courseId, i)}
-                            style={{ accentColor: colors_light[i] }}
-                          />
+                {selectedCourses.map(({ course, sections }) => (
+                  <div key={course.courseId} className="card" style={{ padding: "1rem", boxSizing: "border-box", width: "calc(33.33% - 1rem)" }}>
+                    <h3>{course.title} ({course.courseId})</h3>
+                    {sections.map(section => {
+                      const instructors = section.instructors?.map(inst => inst.instructor).join(", ") || "TBA";
+                      const timeLoc = section.timeLocations?.[0] || {};
+                      const timeInfo = timeLoc.beginTime ? `${timeLoc.days} ${timeLoc.beginTime}-${timeLoc.endTime}` : "TBA";
+                      const locationInfo = (timeLoc.building && timeLoc.room) ? `${timeLoc.building} ${timeLoc.room}` : "TBA";
+                      return (
+                        <div key={section.enrollCode}>
+                          <p>Section {section.section}</p>
+                          <p>Instructors: {instructors}</p>
+                          <p>Time: {timeInfo}</p>
+                          <p>Location: {locationInfo}</p>
                         </div>
-                      ))}
-                      <p>Reminder Minutes: </p>
-                      <input
-                        type="number"
-                        value={reminderStates[course.courseId] ?? "" }  // default is 10 minutes
-                        min="0"
-                        onChange={(e) => {
-                          const newValue = e.target.value;
+                      )
+                    })}
+                    <button className="button" onClick={() => deleteCourse(selectedCourses, course.courseId)}>
+                      Delete Course
+                    </button>
+                    <p>Event Color: </p>
+                    {options.map((o, i) => (
+                      <div key={i} style={{ display: 'inline-block', padding: '2px', backgroundColor: colors_light[i] }}>
+                        <input
+                          type="checkbox"
+                          checked={i === checkboxStates[course.courseId]}
+                          onChange={() => onColorChange(course.courseId, i)}
+                          style={{ accentColor: colors_light[i] }}
+                        />
+                      </div>
+                    ))}
+                    <p>Reminder Minutes: </p>
+                    <input
+                      type="number"
+                      value={reminderStates[course.courseId] ?? "" }  // default is 10 minutes
+                      min="0"
+                      onChange={(e) => {
+                        const newValue = e.target.value;
+                        setReminderStates((prev) => ({
+                          ...prev,
+                          [course.courseId]: newValue === "" ? "" : parseInt(newValue, 10),
+                        }));
+                      }}
+                      onBlur={(e) => {
+                        if (e.target.value === "") {
                           setReminderStates((prev) => ({
                             ...prev,
-                            [course.courseId]: newValue === "" ? "" : parseInt(newValue, 10),
+                            [course.courseId]: 10,
                           }));
-                        }}
-                        onBlur={(e) => {
-                          if (e.target.value === "") {
-                            setReminderStates((prev) => ({
-                              ...prev,
-                              [course.courseId]: 10,
-                            }));
-                          }
-                        }}
-                        style={{ width: "50px" }}
-                      />
-                    </div>
-                  );
-                })}
+                        }
+                      }}
+                      style={{ width: "50px" }}
+                    />
+                  </div>
+                ))}
               </div>
             </div>
           )}
