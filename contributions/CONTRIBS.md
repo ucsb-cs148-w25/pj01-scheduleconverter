@@ -1,58 +1,23 @@
-# Team Contributions
+# Team Contributions Summary
 
-<!-- Nathan -->
 ## Nathan
- - In-code contributions: Correction to license and removal of test, added ability to add several sections at once.
- - Documentation contributions: Lead multiple standups and made progress on several lab deliverables, leading deployment documentation.
- - General contributions: Presented ideas for project direction, debugged and discovered multiple issues, researched UCSB APIs and their functionality.
+Nathan contributed significantly through code improvements, notably by correcting licenses, removing redundant tests, and enhancing functionality to enable multiple section additions simultaneously. He actively led multiple standup meetings, advanced various lab deliverables, and directed the creation of deployment documentation. Nathan was instrumental in shaping the project's direction, identifying and debugging critical issues, and conducting comprehensive research into UCSB API capabilities.
 
-<!-- Bharat -->
 ## Bharat
-- Adding functionality to allow one to export their schedule as an ICS file
-    - A file able to be imported into most calendar software applications
- - Laid groundwork for API interactions with GCal with our website 
-    - Got the prototype for adding an event to one's own Google Calendar to work
- - Developed initial workings for Google OAuth on our website and the Google Cloud
-    - Made a working Sign In with Google button
-        - (specifically UCSB email accounts only)
+Bharat implemented key features enabling users to export schedules as ICS files compatible with common calendar software. He laid essential groundwork for interactions with Google Calendar, successfully prototyping event additions. Bharat also established the initial Google OAuth functionality for UCSB email account-specific sign-ins, greatly enhancing the website's integration capabilities.
 
-<!-- Gio -->
 ## Gio
- * Added theming to site (dark mode)
-    * Implemented user-tailored persistency for theme
- * Set up port to Vite as possible future security/feature updates
- * Implemented prod deployment for project on Netlify
- * Enhanced documentation for self-hosting project
- * Fixed UI bugs/issues
- * Concatenated standups on agreed upon rotation
+Gio significantly improved user experience by adding a dark mode feature with persistent user settings. He initiated a project port to Vite for enhanced security and future feature compatibility, deployed the production version on Netlify, refined documentation for self-hosting, fixed numerous UI bugs, and organized standup summaries on a rotating schedule.
 
-<!-- Abby -->
 ## Abby
-- In-code contributions: add event based on timezone (solves problem of 1 hour difference when daylight saving), add function to select color for events, deletion of courses function, some unit test writing, small UI designs, and partial contribution to dropdown function in course searching (a branch not pulled into main).
-- Documentation contributions: led several standup meetings and made progress on several lab documents
+Abby focused on refining core functionality, addressing timezone-based event discrepancies, implementing color selection for events, developing a course deletion function, writing unit tests, and making UI design enhancements. Additionally, she contributed to developing a dropdown course search feature. Abby effectively led several standups and made notable progress on documentation.
 
-<!-- Yungong -->
 ## Yungong
-- In-code contributions: created a fake database, fixed some API connection issues, add some integration tests
-- Documentation contributions: made MVP videso and user manual document
+Yungong was instrumental in backend improvements, notably by creating a mock database, resolving critical API connectivity issues, and writing integration tests. He also contributed significantly to project documentation by producing the MVP videos and crafting the user manual.
 
-<!-- Christian -->
 ## Christian
-- Set up UCSB API call to retrieve course offerings and dates for a given quarter. 
-- Implemented drop-down quarter and class search/select functionality.
-- Led second retrospective.
-- Led standup according to group rotation.
+Christian made essential API contributions, setting up robust UCSB API interactions for retrieving course offerings and schedules per quarter. He implemented an intuitive quarter and class selection dropdown interface, led the second project retrospective, and facilitated standup meetings per the rotation schedule.
 
-<!-- Ashton -->
 ## Ashton
-### General Group
-- Conducted Standup when it was my turn
-- Led first retrospective
-### Towards MVP
-- Created the initial app/frontend
-- Established Google Oauth connection
-- Established initial connection to google calendar with listEvents function
-- Using Yungong's fake database and Bahrat's addEvent function, created MVP version of adding a student's classes to google calendar
-### After MVP
-- Changed the way classes are displayed when selected
-- Small fixes like the search dropdown not having dark mode coloring
+Ashton spearheaded initial app development, successfully connecting the frontend to Google OAuth and Google Calendar APIs. Leveraging contributions from Bharat and Yungong, he developed the MVP for class integration into Google Calendar. Post-MVP, Ashton refined class display methods and addressed minor interface issues, including UI compatibility with dark mode. He also led the group's first retrospective and actively conducted standup meetings.
+
